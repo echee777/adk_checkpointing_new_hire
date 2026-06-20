@@ -1,0 +1,133 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "start_onboarding",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Start onboarding for Jane Doe, employee_id: emp-123."}]
+      }
+    },
+    {
+      "eval_case_id": "documents_signed_transition",
+      "agent_data": {
+        "agents": {
+          "hr_onboarding_coordinator": {
+            "agent_id": "hr_onboarding_coordinator",
+            "instruction": "Coordinate the new hire onboarding process."
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "parts": [{"text": "Start onboarding for John Smith, employee_id: emp-456."}]
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "name": "send_welcome_packet",
+                        "args": {"employee_id": "emp-456"}
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "user",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "name": "send_welcome_packet",
+                        "response": {"status": "SUCCESS"}
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "parts": [{"text": "Webhook Event: documents_signed for emp-456"}]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eval_case_id": "docusign_timeout_transition",
+      "agent_data": {
+        "agents": {
+          "hr_onboarding_coordinator": {
+            "agent_id": "hr_onboarding_coordinator",
+            "instruction": "Coordinate the new hire onboarding process."
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "parts": [{"text": "Start onboarding for Bob Jones, employee_id: emp-789."}]
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "name": "send_welcome_packet",
+                        "args": {"employee_id": "emp-789"}
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "user",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "name": "send_welcome_packet",
+                        "response": {"status": "SUCCESS"}
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "parts": [{"text": "Webhook Event: document_signature_timeout for emp-789"}]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

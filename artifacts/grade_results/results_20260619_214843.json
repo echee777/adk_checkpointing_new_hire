@@ -1,0 +1,1091 @@
+{
+  "eval_case_results": [
+    {
+      "eval_case_index": 0,
+      "response_candidate_results": [
+        {
+          "response_index": 0,
+          "metric_results": {
+            "deterministic_task_success": {
+              "metric_name": "deterministic_task_success",
+              "score": 5.0,
+              "explanation": "Tools called correctly.",
+              "rubric_verdicts": null,
+              "raw_output": null,
+              "error_message": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "eval_case_index": 1,
+      "response_candidate_results": [
+        {
+          "response_index": 0,
+          "metric_results": {
+            "deterministic_task_success": {
+              "metric_name": "deterministic_task_success",
+              "score": 5.0,
+              "explanation": "Tools called correctly.",
+              "rubric_verdicts": null,
+              "raw_output": null,
+              "error_message": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "eval_case_index": 2,
+      "response_candidate_results": [
+        {
+          "response_index": 0,
+          "metric_results": {
+            "deterministic_task_success": {
+              "metric_name": "deterministic_task_success",
+              "score": 5.0,
+              "explanation": "Tools called correctly.",
+              "rubric_verdicts": null,
+              "raw_output": null,
+              "error_message": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "summary_metrics": [
+    {
+      "metric_name": "deterministic_task_success",
+      "num_cases_total": 3,
+      "num_cases_valid": 3,
+      "num_cases_error": 0,
+      "mean_score": 5.0,
+      "stdev_score": 0.0,
+      "pass_rate": null
+    }
+  ],
+  "win_rates": null,
+  "evaluation_dataset": [
+    {
+      "bigquery_source": null,
+      "gcs_source": null,
+      "eval_cases": [
+        {
+          "prompt": {
+            "parts": [
+              {
+                "media_resolution": null,
+                "code_execution_result": null,
+                "executable_code": null,
+                "file_data": null,
+                "function_call": null,
+                "function_response": null,
+                "inline_data": null,
+                "text": "Start onboarding for Jane Doe, employee_id: emp-123.",
+                "thought": null,
+                "thought_signature": null,
+                "video_metadata": null,
+                "tool_call": null,
+                "tool_response": null,
+                "part_metadata": null
+              }
+            ],
+            "role": "user"
+          },
+          "responses": [
+            {
+              "response": {
+                "parts": [
+                  {
+                    "media_resolution": null,
+                    "code_execution_result": null,
+                    "executable_code": null,
+                    "file_data": null,
+                    "function_call": null,
+                    "function_response": null,
+                    "inline_data": null,
+                    "text": "{\"employee_id\": \"emp-123\", \"status\": \"AWAITING_DOCUMENTS\", \"notes\": \"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\"}",
+                    "thought": null,
+                    "thought_signature": null,
+                    "video_metadata": null,
+                    "tool_call": null,
+                    "tool_response": null,
+                    "part_metadata": null
+                  }
+                ],
+                "role": "model"
+              }
+            }
+          ],
+          "reference": null,
+          "system_instruction": null,
+          "conversation_history": null,
+          "rubric_groups": null,
+          "eval_case_id": "start_onboarding",
+          "intermediate_events": null,
+          "agent_info": null,
+          "agent_data": {
+            "agents": {
+              "hr_onboarding_workflow": {
+                "agent_id": "hr_onboarding_workflow",
+                "agent_type": "Workflow",
+                "description": "",
+                "instruction": null,
+                "tools": [],
+                "sub_agents": []
+              }
+            },
+            "turns": [
+              {
+                "turn_index": 0,
+                "turn_id": "turn_0",
+                "events": [
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "fiq3za28",
+                            "args": {
+                              "employee_id": "emp-123",
+                              "name": "Jane Doe"
+                            },
+                            "name": "send_welcome_packet",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "fiq3za28",
+                            "name": "send_welcome_packet",
+                            "response": {
+                              "result": "{\"status\": \"SUCCESS\", \"action\": \"WELCOME_PACKET_SENT\", \"employee_id\": \"emp-123\", \"name\": \"Jane Doe\", \"message\": \"Welcome packet dispatched via DocuSign.\"}"
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "w6k8b373",
+                            "args": {
+                              "status": "AWAITING_DOCUMENTS",
+                              "employee_id": "emp-123",
+                              "notes": "Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook."
+                            },
+                            "name": "set_model_response",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "w6k8b373",
+                            "name": "set_model_response",
+                            "response": {
+                              "employee_id": "emp-123",
+                              "status": "AWAITING_DOCUMENTS",
+                              "notes": "Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook."
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "{\"employee_id\": \"emp-123\", \"status\": \"AWAITING_DOCUMENTS\", \"notes\": \"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\"}",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              }
+            ]
+          },
+          "user_scenario": null
+        },
+        {
+          "prompt": null,
+          "responses": [
+            {
+              "response": {
+                "parts": [
+                  {
+                    "media_resolution": null,
+                    "code_execution_result": null,
+                    "executable_code": null,
+                    "file_data": null,
+                    "function_call": null,
+                    "function_response": null,
+                    "inline_data": null,
+                    "text": "{\"employee_id\": \"emp-456\", \"status\": \"WAITING_FOR_HARDWARE_DELIVERY\", \"notes\": \"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\"}",
+                    "thought": null,
+                    "thought_signature": null,
+                    "video_metadata": null,
+                    "tool_call": null,
+                    "tool_response": null,
+                    "part_metadata": null
+                  }
+                ],
+                "role": "model"
+              }
+            }
+          ],
+          "reference": null,
+          "system_instruction": null,
+          "conversation_history": null,
+          "rubric_groups": null,
+          "eval_case_id": "documents_signed_transition",
+          "intermediate_events": null,
+          "agent_info": null,
+          "agent_data": {
+            "agents": {
+              "hr_onboarding_workflow": {
+                "agent_id": "hr_onboarding_workflow",
+                "agent_type": "Workflow",
+                "description": "",
+                "instruction": null,
+                "tools": [],
+                "sub_agents": []
+              }
+            },
+            "turns": [
+              {
+                "turn_index": 0,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Start onboarding for John Smith, employee_id: emp-456.",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": null,
+                            "args": {
+                              "employee_id": "emp-456"
+                            },
+                            "name": "send_welcome_packet",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": null,
+                            "name": "send_welcome_packet",
+                            "response": {
+                              "status": "SUCCESS"
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              },
+              {
+                "turn_index": 1,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Webhook Event: documents_signed for emp-456",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "yh6pdnqc",
+                            "args": {
+                              "employee_id": "emp-456"
+                            },
+                            "name": "provision_software_accounts",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "yh6pdnqc",
+                            "name": "provision_software_accounts",
+                            "response": {
+                              "result": "{\"status\": \"SUCCESS\", \"action\": \"SOFTWARE_PROVISIONED\", \"employee_id\": \"emp-456\", \"message\": \"All standard software accounts created.\"}"
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "mkpo7wbn",
+                            "args": {
+                              "employee_id": "emp-456"
+                            },
+                            "name": "order_hardware",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "mkpo7wbn",
+                            "name": "order_hardware",
+                            "response": {
+                              "result": "{\"status\": \"SUCCESS\", \"action\": \"HARDWARE_ORDERED\", \"employee_id\": \"emp-456\", \"tracking_id\": \"HW-456\", \"message\": \"Hardware ordered successfully.\"}"
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "ya3heuzg",
+                            "args": {
+                              "notes": "The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.",
+                              "employee_id": "emp-456",
+                              "status": "WAITING_FOR_HARDWARE_DELIVERY"
+                            },
+                            "name": "set_model_response",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "ya3heuzg",
+                            "name": "set_model_response",
+                            "response": {
+                              "employee_id": "emp-456",
+                              "status": "WAITING_FOR_HARDWARE_DELIVERY",
+                              "notes": "The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process."
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "{\"employee_id\": \"emp-456\", \"status\": \"WAITING_FOR_HARDWARE_DELIVERY\", \"notes\": \"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\"}",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              }
+            ]
+          },
+          "user_scenario": null
+        },
+        {
+          "prompt": null,
+          "responses": [
+            {
+              "response": {
+                "parts": [
+                  {
+                    "media_resolution": null,
+                    "code_execution_result": null,
+                    "executable_code": null,
+                    "file_data": null,
+                    "function_call": null,
+                    "function_response": null,
+                    "inline_data": null,
+                    "text": "{\"employee_id\": \"emp-789\", \"status\": \"Awaiting HR Intervention\", \"notes\": \"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\"}",
+                    "thought": null,
+                    "thought_signature": null,
+                    "video_metadata": null,
+                    "tool_call": null,
+                    "tool_response": null,
+                    "part_metadata": null
+                  }
+                ],
+                "role": "model"
+              }
+            }
+          ],
+          "reference": null,
+          "system_instruction": null,
+          "conversation_history": null,
+          "rubric_groups": null,
+          "eval_case_id": "docusign_timeout_transition",
+          "intermediate_events": null,
+          "agent_info": null,
+          "agent_data": {
+            "agents": {
+              "hr_onboarding_workflow": {
+                "agent_id": "hr_onboarding_workflow",
+                "agent_type": "Workflow",
+                "description": "",
+                "instruction": null,
+                "tools": [],
+                "sub_agents": []
+              }
+            },
+            "turns": [
+              {
+                "turn_index": 0,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Start onboarding for Bob Jones, employee_id: emp-789.",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": null,
+                            "args": {
+                              "employee_id": "emp-789"
+                            },
+                            "name": "send_welcome_packet",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": null,
+                            "name": "send_welcome_packet",
+                            "response": {
+                              "status": "SUCCESS"
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              },
+              {
+                "turn_index": 1,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Webhook Event: document_signature_timeout for emp-789",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "u6yowqot",
+                            "args": {
+                              "status": "Awaiting HR Intervention",
+                              "notes": "Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.",
+                              "employee_id": "emp-789"
+                            },
+                            "name": "set_model_response",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "u6yowqot",
+                            "name": "set_model_response",
+                            "response": {
+                              "employee_id": "emp-789",
+                              "status": "Awaiting HR Intervention",
+                              "notes": "Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware."
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "{\"employee_id\": \"emp-789\", \"status\": \"Awaiting HR Intervention\", \"notes\": \"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\"}",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              }
+            ]
+          },
+          "user_scenario": null
+        }
+      ],
+      "eval_dataset_df": null,
+      "candidate_name": null
+    }
+  ],
+  "metadata": {
+    "candidate_names": [
+      "candidate_1"
+    ],
+    "dataset_name": null,
+    "dataset_id": null,
+    "creation_timestamp": "2026-06-20T04:48:43.713667Z",
+    "dataset": [
+      {
+        "prompt_display_text": "Start onboarding for Jane Doe, employee_id: emp-123.",
+        "prompt_raw_json": "{\n  \"parts\": [\n    {\n      \"text\": \"Start onboarding for Jane Doe, employee_id: emp-123.\"\n    }\n  ],\n  \"role\": \"user\"\n}",
+        "reference": "",
+        "reference_raw_json": "",
+        "response_display_text": "{\"employee_id\": \"emp-123\", \"status\": \"AWAITING_DOCUMENTS\", \"notes\": \"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\"}",
+        "response_raw_json": "{\n  \"parts\": [\n    {\n      \"text\": \"{\\\"employee_id\\\": \\\"emp-123\\\", \\\"status\\\": \\\"AWAITING_DOCUMENTS\\\", \\\"notes\\\": \\\"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\\\"}\"\n    }\n  ],\n  \"role\": \"model\"\n}",
+        "intermediate_events": null,
+        "agent_data": "{\"agents\": {\"hr_onboarding_workflow\": {\"agent_id\": \"hr_onboarding_workflow\", \"agent_type\": \"Workflow\", \"description\": \"\", \"tools\": [], \"sub_agents\": []}}, \"turns\": [{\"turn_index\": 0, \"turn_id\": \"turn_0\", \"events\": [{\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"fiq3za28\", \"args\": {\"employee_id\": \"emp-123\", \"name\": \"Jane Doe\"}, \"name\": \"send_welcome_packet\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"fiq3za28\", \"name\": \"send_welcome_packet\", \"response\": {\"result\": \"{\\\"status\\\": \\\"SUCCESS\\\", \\\"action\\\": \\\"WELCOME_PACKET_SENT\\\", \\\"employee_id\\\": \\\"emp-123\\\", \\\"name\\\": \\\"Jane Doe\\\", \\\"message\\\": \\\"Welcome packet dispatched via DocuSign.\\\"}\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"w6k8b373\", \"args\": {\"status\": \"AWAITING_DOCUMENTS\", \"employee_id\": \"emp-123\", \"notes\": \"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\"}, \"name\": \"set_model_response\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"w6k8b373\", \"name\": \"set_model_response\", \"response\": {\"employee_id\": \"emp-123\", \"status\": \"AWAITING_DOCUMENTS\", \"notes\": \"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"text\": \"{\\\"employee_id\\\": \\\"emp-123\\\", \\\"status\\\": \\\"AWAITING_DOCUMENTS\\\", \\\"notes\\\": \\\"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\\\"}\"}], \"role\": \"model\"}}]}]}"
+      },
+      {
+        "prompt_display_text": "",
+        "prompt_raw_json": "",
+        "reference": "",
+        "reference_raw_json": "",
+        "response_display_text": "{\"employee_id\": \"emp-456\", \"status\": \"WAITING_FOR_HARDWARE_DELIVERY\", \"notes\": \"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\"}",
+        "response_raw_json": "{\n  \"parts\": [\n    {\n      \"text\": \"{\\\"employee_id\\\": \\\"emp-456\\\", \\\"status\\\": \\\"WAITING_FOR_HARDWARE_DELIVERY\\\", \\\"notes\\\": \\\"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\\\"}\"\n    }\n  ],\n  \"role\": \"model\"\n}",
+        "intermediate_events": null,
+        "agent_data": "{\"agents\": {\"hr_onboarding_workflow\": {\"agent_id\": \"hr_onboarding_workflow\", \"agent_type\": \"Workflow\", \"description\": \"\", \"tools\": [], \"sub_agents\": []}}, \"turns\": [{\"turn_index\": 0, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Start onboarding for John Smith, employee_id: emp-456.\"}]}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"args\": {\"employee_id\": \"emp-456\"}, \"name\": \"send_welcome_packet\"}}]}}, {\"author\": \"user\", \"content\": {\"parts\": [{\"function_response\": {\"name\": \"send_welcome_packet\", \"response\": {\"status\": \"SUCCESS\"}}}]}}]}, {\"turn_index\": 1, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Webhook Event: documents_signed for emp-456\"}]}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"yh6pdnqc\", \"args\": {\"employee_id\": \"emp-456\"}, \"name\": \"provision_software_accounts\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"yh6pdnqc\", \"name\": \"provision_software_accounts\", \"response\": {\"result\": \"{\\\"status\\\": \\\"SUCCESS\\\", \\\"action\\\": \\\"SOFTWARE_PROVISIONED\\\", \\\"employee_id\\\": \\\"emp-456\\\", \\\"message\\\": \\\"All standard software accounts created.\\\"}\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"mkpo7wbn\", \"args\": {\"employee_id\": \"emp-456\"}, \"name\": \"order_hardware\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"mkpo7wbn\", \"name\": \"order_hardware\", \"response\": {\"result\": \"{\\\"status\\\": \\\"SUCCESS\\\", \\\"action\\\": \\\"HARDWARE_ORDERED\\\", \\\"employee_id\\\": \\\"emp-456\\\", \\\"tracking_id\\\": \\\"HW-456\\\", \\\"message\\\": \\\"Hardware ordered successfully.\\\"}\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"ya3heuzg\", \"args\": {\"notes\": \"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\", \"employee_id\": \"emp-456\", \"status\": \"WAITING_FOR_HARDWARE_DELIVERY\"}, \"name\": \"set_model_response\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"ya3heuzg\", \"name\": \"set_model_response\", \"response\": {\"employee_id\": \"emp-456\", \"status\": \"WAITING_FOR_HARDWARE_DELIVERY\", \"notes\": \"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"text\": \"{\\\"employee_id\\\": \\\"emp-456\\\", \\\"status\\\": \\\"WAITING_FOR_HARDWARE_DELIVERY\\\", \\\"notes\\\": \\\"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\\\"}\"}], \"role\": \"model\"}}]}]}"
+      },
+      {
+        "prompt_display_text": "",
+        "prompt_raw_json": "",
+        "reference": "",
+        "reference_raw_json": "",
+        "response_display_text": "{\"employee_id\": \"emp-789\", \"status\": \"Awaiting HR Intervention\", \"notes\": \"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\"}",
+        "response_raw_json": "{\n  \"parts\": [\n    {\n      \"text\": \"{\\\"employee_id\\\": \\\"emp-789\\\", \\\"status\\\": \\\"Awaiting HR Intervention\\\", \\\"notes\\\": \\\"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\\\"}\"\n    }\n  ],\n  \"role\": \"model\"\n}",
+        "intermediate_events": null,
+        "agent_data": "{\"agents\": {\"hr_onboarding_workflow\": {\"agent_id\": \"hr_onboarding_workflow\", \"agent_type\": \"Workflow\", \"description\": \"\", \"tools\": [], \"sub_agents\": []}}, \"turns\": [{\"turn_index\": 0, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Start onboarding for Bob Jones, employee_id: emp-789.\"}]}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"args\": {\"employee_id\": \"emp-789\"}, \"name\": \"send_welcome_packet\"}}]}}, {\"author\": \"user\", \"content\": {\"parts\": [{\"function_response\": {\"name\": \"send_welcome_packet\", \"response\": {\"status\": \"SUCCESS\"}}}]}}]}, {\"turn_index\": 1, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Webhook Event: document_signature_timeout for emp-789\"}]}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"u6yowqot\", \"args\": {\"status\": \"Awaiting HR Intervention\", \"notes\": \"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\", \"employee_id\": \"emp-789\"}, \"name\": \"set_model_response\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"u6yowqot\", \"name\": \"set_model_response\", \"response\": {\"employee_id\": \"emp-789\", \"status\": \"Awaiting HR Intervention\", \"notes\": \"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"text\": \"{\\\"employee_id\\\": \\\"emp-789\\\", \\\"status\\\": \\\"Awaiting HR Intervention\\\", \\\"notes\\\": \\\"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\\\"}\"}], \"role\": \"model\"}}]}]}"
+      }
+    ]
+  },
+  "agent_info": null
+}

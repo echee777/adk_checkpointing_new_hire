@@ -1,0 +1,186 @@
+{
+  "eval_cases": [
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "Hello, what can you help me with?"
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "{\"employee_id\": \"N/A\", \"status\": \"Awaiting onboarding initiation\", \"notes\": \"I am the HR Onboarding Coordinator. I orchestrate the onboarding process for new hires. To begin, please provide the employee's name and employee ID so I can dispatch their welcome packet and initiate the onboarding flow.\"}"
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "greeting",
+      "agent_data": {
+        "agents": {
+          "hr_onboarding_workflow": {
+            "agent_id": "hr_onboarding_workflow",
+            "agent_type": "Workflow",
+            "description": "",
+            "tools": [],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "3i1mynnd",
+                        "args": {
+                          "status": "Awaiting onboarding initiation",
+                          "notes": "I am the HR Onboarding Coordinator. I orchestrate the onboarding process for new hires. To begin, please provide the employee's name and employee ID so I can dispatch their welcome packet and initiate the onboarding flow.",
+                          "employee_id": "N/A"
+                        },
+                        "name": "set_model_response"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "3i1mynnd",
+                        "name": "set_model_response",
+                        "response": {
+                          "employee_id": "N/A",
+                          "status": "Awaiting onboarding initiation",
+                          "notes": "I am the HR Onboarding Coordinator. I orchestrate the onboarding process for new hires. To begin, please provide the employee's name and employee ID so I can dispatch their welcome packet and initiate the onboarding flow."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "{\"employee_id\": \"N/A\", \"status\": \"Awaiting onboarding initiation\", \"notes\": \"I am the HR Onboarding Coordinator. I orchestrate the onboarding process for new hires. To begin, please provide the employee's name and employee ID so I can dispatch their welcome packet and initiate the onboarding flow.\"}"
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "What's the weather like in San Francisco?"
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "{\"employee_id\": \"N/A\", \"status\": \"waiting_for_onboarding_trigger\", \"notes\": \"I am the HR Onboarding Coordinator. Please provide the new hire's name and employee ID to start the onboarding process. I am unable to answer general questions like the weather.\"}"
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "weather_query",
+      "agent_data": {
+        "agents": {
+          "hr_onboarding_workflow": {
+            "agent_id": "hr_onboarding_workflow",
+            "agent_type": "Workflow",
+            "description": "",
+            "tools": [],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "urjezf24",
+                        "args": {
+                          "notes": "I am the HR Onboarding Coordinator. Please provide the new hire's name and employee ID to start the onboarding process. I am unable to answer general questions like the weather.",
+                          "status": "waiting_for_onboarding_trigger",
+                          "employee_id": "N/A"
+                        },
+                        "name": "set_model_response"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "urjezf24",
+                        "name": "set_model_response",
+                        "response": {
+                          "employee_id": "N/A",
+                          "status": "waiting_for_onboarding_trigger",
+                          "notes": "I am the HR Onboarding Coordinator. Please provide the new hire's name and employee ID to start the onboarding process. I am unable to answer general questions like the weather."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "{\"employee_id\": \"N/A\", \"status\": \"waiting_for_onboarding_trigger\", \"notes\": \"I am the HR Onboarding Coordinator. Please provide the new hire's name and employee ID to start the onboarding process. I am unable to answer general questions like the weather.\"}"
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

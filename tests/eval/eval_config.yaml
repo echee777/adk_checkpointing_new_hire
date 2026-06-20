@@ -1,0 +1,25 @@
+metrics_to_run:
+  - deterministic_task_success
+
+# ADK executes `custom_function` string blocks via Python's `exec()`.
+# The string must define a function named exactly `evaluate(instance)`.
+# To avoid losing syntax highlighting, we use the "thunk" pattern here:
+# We define a tiny proxy function that delegates the work to a proper .py file.
+custom_metrics:
+  - name: deterministic_task_success
+    custom_function: |
+      import sys
+      import os
+      
+      # Ensure tests directory is in the path
+      sys.path.insert(0, os.getcwd())
+      from tests.eval.metrics import evaluate_task_success
+      
+      def evaluate(instance):
+          """
+          Thunk function: This is the entry point ADK hooks into. 
+          It delegates grading execution to the natively highlighted 
+          `tests/eval/metrics.py` implementation.
+          """
+          return evaluate_task_success(instance)
+

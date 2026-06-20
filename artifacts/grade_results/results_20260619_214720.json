@@ -1,0 +1,994 @@
+{
+  "eval_case_results": [
+    {
+      "eval_case_index": 0,
+      "response_candidate_results": [
+        {
+          "response_index": 0,
+          "metric_results": {
+            "deterministic_task_success": {
+              "metric_name": "deterministic_task_success",
+              "score": 1.0,
+              "explanation": "Missing send_welcome_packet on turn 0",
+              "rubric_verdicts": null,
+              "raw_output": null,
+              "error_message": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "eval_case_index": 1,
+      "response_candidate_results": [
+        {
+          "response_index": 0,
+          "metric_results": {
+            "deterministic_task_success": {
+              "metric_name": "deterministic_task_success",
+              "score": 1.0,
+              "explanation": "Missing send_welcome_packet on turn 0",
+              "rubric_verdicts": null,
+              "raw_output": null,
+              "error_message": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "eval_case_index": 2,
+      "response_candidate_results": [
+        {
+          "response_index": 0,
+          "metric_results": {
+            "deterministic_task_success": {
+              "metric_name": "deterministic_task_success",
+              "score": 1.0,
+              "explanation": "Missing send_welcome_packet on turn 0",
+              "rubric_verdicts": null,
+              "raw_output": null,
+              "error_message": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "summary_metrics": [
+    {
+      "metric_name": "deterministic_task_success",
+      "num_cases_total": 3,
+      "num_cases_valid": 3,
+      "num_cases_error": 0,
+      "mean_score": 1.0,
+      "stdev_score": 0.0,
+      "pass_rate": null
+    }
+  ],
+  "win_rates": null,
+  "evaluation_dataset": [
+    {
+      "bigquery_source": null,
+      "gcs_source": null,
+      "eval_cases": [
+        {
+          "prompt": null,
+          "responses": [
+            {
+              "response": {
+                "parts": [
+                  {
+                    "media_resolution": null,
+                    "code_execution_result": null,
+                    "executable_code": null,
+                    "file_data": null,
+                    "function_call": null,
+                    "function_response": null,
+                    "inline_data": null,
+                    "text": "{\"employee_id\": \"unknown\", \"status\": \"COMPLETE\", \"notes\": \"Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete.\"}",
+                    "thought": null,
+                    "thought_signature": null,
+                    "video_metadata": null,
+                    "tool_call": null,
+                    "tool_response": null,
+                    "part_metadata": null
+                  }
+                ],
+                "role": "model"
+              }
+            }
+          ],
+          "reference": null,
+          "system_instruction": null,
+          "conversation_history": null,
+          "rubric_groups": null,
+          "eval_case_id": "happy_path_onboarding",
+          "intermediate_events": null,
+          "agent_info": null,
+          "agent_data": {
+            "agents": {
+              "hr_onboarding_workflow": {
+                "agent_id": "hr_onboarding_workflow",
+                "agent_type": "Workflow",
+                "description": "",
+                "instruction": null,
+                "tools": [],
+                "sub_agents": []
+              }
+            },
+            "turns": [
+              {
+                "turn_index": 0,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Start onboarding for Jane Doe, employee_id: emp-123.",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              },
+              {
+                "turn_index": 1,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Webhook Event: documents_signed for emp-123",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              },
+              {
+                "turn_index": 2,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Webhook Event: hardware_delivered for tracking ID HW-999",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "ll0brwj6",
+                            "args": {
+                              "notes": "Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete.",
+                              "status": "COMPLETE",
+                              "employee_id": "unknown"
+                            },
+                            "name": "set_model_response",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "ll0brwj6",
+                            "name": "set_model_response",
+                            "response": {
+                              "employee_id": "unknown",
+                              "status": "COMPLETE",
+                              "notes": "Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete."
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "{\"employee_id\": \"unknown\", \"status\": \"COMPLETE\", \"notes\": \"Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete.\"}",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              }
+            ]
+          },
+          "user_scenario": null
+        },
+        {
+          "prompt": null,
+          "responses": [
+            {
+              "response": {
+                "parts": [
+                  {
+                    "media_resolution": null,
+                    "code_execution_result": null,
+                    "executable_code": null,
+                    "file_data": null,
+                    "function_call": null,
+                    "function_response": null,
+                    "inline_data": null,
+                    "text": "{\"employee_id\": \"emp-456\", \"status\": \"COMPLETE\", \"notes\": \"Received manual IT override webhook. Onboarding is now complete.\"}",
+                    "thought": null,
+                    "thought_signature": null,
+                    "video_metadata": null,
+                    "tool_call": null,
+                    "tool_response": null,
+                    "part_metadata": null
+                  }
+                ],
+                "role": "model"
+              }
+            }
+          ],
+          "reference": null,
+          "system_instruction": null,
+          "conversation_history": null,
+          "rubric_groups": null,
+          "eval_case_id": "it_provisioning_failure_path",
+          "intermediate_events": null,
+          "agent_info": null,
+          "agent_data": {
+            "agents": {
+              "hr_onboarding_workflow": {
+                "agent_id": "hr_onboarding_workflow",
+                "agent_type": "Workflow",
+                "description": "",
+                "instruction": null,
+                "tools": [],
+                "sub_agents": []
+              }
+            },
+            "turns": [
+              {
+                "turn_index": 0,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Start onboarding for John Smith, employee_id: emp-456.",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              },
+              {
+                "turn_index": 1,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Webhook Event: documents_signed for emp-456",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              },
+              {
+                "turn_index": 2,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Webhook Event: manual_it_override for emp-456 (IT provisioned manually after failure)",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "e4rvxdqj",
+                            "args": {
+                              "notes": "Received manual IT override webhook. Onboarding is now complete.",
+                              "employee_id": "emp-456",
+                              "status": "COMPLETE"
+                            },
+                            "name": "set_model_response",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "e4rvxdqj",
+                            "name": "set_model_response",
+                            "response": {
+                              "employee_id": "emp-456",
+                              "status": "COMPLETE",
+                              "notes": "Received manual IT override webhook. Onboarding is now complete."
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "{\"employee_id\": \"emp-456\", \"status\": \"COMPLETE\", \"notes\": \"Received manual IT override webhook. Onboarding is now complete.\"}",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              }
+            ]
+          },
+          "user_scenario": null
+        },
+        {
+          "prompt": null,
+          "responses": [
+            {
+              "response": {
+                "parts": [
+                  {
+                    "media_resolution": null,
+                    "code_execution_result": null,
+                    "executable_code": null,
+                    "file_data": null,
+                    "function_call": null,
+                    "function_response": null,
+                    "inline_data": null,
+                    "text": "{\"employee_id\": \"emp-789\", \"status\": \"AWAITING_HARDWARE_DELIVERY\", \"notes\": \"Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override.\"}",
+                    "thought": null,
+                    "thought_signature": null,
+                    "video_metadata": null,
+                    "tool_call": null,
+                    "tool_response": null,
+                    "part_metadata": null
+                  }
+                ],
+                "role": "model"
+              }
+            }
+          ],
+          "reference": null,
+          "system_instruction": null,
+          "conversation_history": null,
+          "rubric_groups": null,
+          "eval_case_id": "docusign_timeout_path",
+          "intermediate_events": null,
+          "agent_info": null,
+          "agent_data": {
+            "agents": {
+              "hr_onboarding_workflow": {
+                "agent_id": "hr_onboarding_workflow",
+                "agent_type": "Workflow",
+                "description": "",
+                "instruction": null,
+                "tools": [],
+                "sub_agents": []
+              }
+            },
+            "turns": [
+              {
+                "turn_index": 0,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Start onboarding for Bob Jones, employee_id: emp-789.",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              },
+              {
+                "turn_index": 1,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Webhook Event: document_signature_timeout for emp-789",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              },
+              {
+                "turn_index": 2,
+                "turn_id": null,
+                "events": [
+                  {
+                    "author": "user",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "Webhook Event: manual_hr_override for emp-789 (Documents manually collected)",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": null
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "3p8psfbq",
+                            "args": {
+                              "employee_id": "emp-789"
+                            },
+                            "name": "provision_software_accounts",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        },
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "k38na0dw",
+                            "args": {
+                              "employee_id": "emp-789"
+                            },
+                            "name": "order_hardware",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "3p8psfbq",
+                            "name": "provision_software_accounts",
+                            "response": {
+                              "result": "{\"status\": \"SUCCESS\", \"action\": \"SOFTWARE_PROVISIONED\", \"employee_id\": \"emp-789\", \"message\": \"All standard software accounts created.\"}"
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        },
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "k38na0dw",
+                            "name": "order_hardware",
+                            "response": {
+                              "result": "{\"status\": \"SUCCESS\", \"action\": \"HARDWARE_ORDERED\", \"employee_id\": \"emp-789\", \"tracking_id\": \"HW-789\", \"message\": \"Hardware ordered successfully.\"}"
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": {
+                            "id": "z757ox3n",
+                            "args": {
+                              "employee_id": "emp-789",
+                              "notes": "Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override.",
+                              "status": "AWAITING_HARDWARE_DELIVERY"
+                            },
+                            "name": "set_model_response",
+                            "partial_args": null,
+                            "will_continue": null
+                          },
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": {
+                            "will_continue": null,
+                            "scheduling": null,
+                            "parts": null,
+                            "id": "z757ox3n",
+                            "name": "set_model_response",
+                            "response": {
+                              "employee_id": "emp-789",
+                              "status": "AWAITING_HARDWARE_DELIVERY",
+                              "notes": "Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override."
+                            }
+                          },
+                          "inline_data": null,
+                          "text": null,
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "user"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  },
+                  {
+                    "author": "hr_onboarding_coordinator",
+                    "content": {
+                      "parts": [
+                        {
+                          "media_resolution": null,
+                          "code_execution_result": null,
+                          "executable_code": null,
+                          "file_data": null,
+                          "function_call": null,
+                          "function_response": null,
+                          "inline_data": null,
+                          "text": "{\"employee_id\": \"emp-789\", \"status\": \"AWAITING_HARDWARE_DELIVERY\", \"notes\": \"Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override.\"}",
+                          "thought": null,
+                          "thought_signature": null,
+                          "video_metadata": null,
+                          "tool_call": null,
+                          "tool_response": null,
+                          "part_metadata": null
+                        }
+                      ],
+                      "role": "model"
+                    },
+                    "event_time": null,
+                    "state_delta": null,
+                    "active_tools": null
+                  }
+                ]
+              }
+            ]
+          },
+          "user_scenario": null
+        }
+      ],
+      "eval_dataset_df": null,
+      "candidate_name": null
+    }
+  ],
+  "metadata": {
+    "candidate_names": [
+      "candidate_1"
+    ],
+    "dataset_name": null,
+    "dataset_id": null,
+    "creation_timestamp": "2026-06-20T04:47:20.115044Z",
+    "dataset": [
+      {
+        "prompt_display_text": "",
+        "prompt_raw_json": "",
+        "reference": "",
+        "reference_raw_json": "",
+        "response_display_text": "{\"employee_id\": \"unknown\", \"status\": \"COMPLETE\", \"notes\": \"Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete.\"}",
+        "response_raw_json": "{\n  \"parts\": [\n    {\n      \"text\": \"{\\\"employee_id\\\": \\\"unknown\\\", \\\"status\\\": \\\"COMPLETE\\\", \\\"notes\\\": \\\"Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete.\\\"}\"\n    }\n  ],\n  \"role\": \"model\"\n}",
+        "intermediate_events": null,
+        "agent_data": "{\"agents\": {\"hr_onboarding_workflow\": {\"agent_id\": \"hr_onboarding_workflow\", \"agent_type\": \"Workflow\", \"description\": \"\", \"tools\": [], \"sub_agents\": []}}, \"turns\": [{\"turn_index\": 0, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Start onboarding for Jane Doe, employee_id: emp-123.\"}]}}]}, {\"turn_index\": 1, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Webhook Event: documents_signed for emp-123\"}]}}]}, {\"turn_index\": 2, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Webhook Event: hardware_delivered for tracking ID HW-999\"}]}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"ll0brwj6\", \"args\": {\"notes\": \"Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete.\", \"status\": \"COMPLETE\", \"employee_id\": \"unknown\"}, \"name\": \"set_model_response\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"ll0brwj6\", \"name\": \"set_model_response\", \"response\": {\"employee_id\": \"unknown\", \"status\": \"COMPLETE\", \"notes\": \"Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete.\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"text\": \"{\\\"employee_id\\\": \\\"unknown\\\", \\\"status\\\": \\\"COMPLETE\\\", \\\"notes\\\": \\\"Hardware delivered successfully (Tracking ID: HW-999). Onboarding is now complete.\\\"}\"}], \"role\": \"model\"}}]}]}"
+      },
+      {
+        "prompt_display_text": "",
+        "prompt_raw_json": "",
+        "reference": "",
+        "reference_raw_json": "",
+        "response_display_text": "{\"employee_id\": \"emp-456\", \"status\": \"COMPLETE\", \"notes\": \"Received manual IT override webhook. Onboarding is now complete.\"}",
+        "response_raw_json": "{\n  \"parts\": [\n    {\n      \"text\": \"{\\\"employee_id\\\": \\\"emp-456\\\", \\\"status\\\": \\\"COMPLETE\\\", \\\"notes\\\": \\\"Received manual IT override webhook. Onboarding is now complete.\\\"}\"\n    }\n  ],\n  \"role\": \"model\"\n}",
+        "intermediate_events": null,
+        "agent_data": "{\"agents\": {\"hr_onboarding_workflow\": {\"agent_id\": \"hr_onboarding_workflow\", \"agent_type\": \"Workflow\", \"description\": \"\", \"tools\": [], \"sub_agents\": []}}, \"turns\": [{\"turn_index\": 0, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Start onboarding for John Smith, employee_id: emp-456.\"}]}}]}, {\"turn_index\": 1, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Webhook Event: documents_signed for emp-456\"}]}}]}, {\"turn_index\": 2, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Webhook Event: manual_it_override for emp-456 (IT provisioned manually after failure)\"}]}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"e4rvxdqj\", \"args\": {\"notes\": \"Received manual IT override webhook. Onboarding is now complete.\", \"employee_id\": \"emp-456\", \"status\": \"COMPLETE\"}, \"name\": \"set_model_response\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"e4rvxdqj\", \"name\": \"set_model_response\", \"response\": {\"employee_id\": \"emp-456\", \"status\": \"COMPLETE\", \"notes\": \"Received manual IT override webhook. Onboarding is now complete.\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"text\": \"{\\\"employee_id\\\": \\\"emp-456\\\", \\\"status\\\": \\\"COMPLETE\\\", \\\"notes\\\": \\\"Received manual IT override webhook. Onboarding is now complete.\\\"}\"}], \"role\": \"model\"}}]}]}"
+      },
+      {
+        "prompt_display_text": "",
+        "prompt_raw_json": "",
+        "reference": "",
+        "reference_raw_json": "",
+        "response_display_text": "{\"employee_id\": \"emp-789\", \"status\": \"AWAITING_HARDWARE_DELIVERY\", \"notes\": \"Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override.\"}",
+        "response_raw_json": "{\n  \"parts\": [\n    {\n      \"text\": \"{\\\"employee_id\\\": \\\"emp-789\\\", \\\"status\\\": \\\"AWAITING_HARDWARE_DELIVERY\\\", \\\"notes\\\": \\\"Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override.\\\"}\"\n    }\n  ],\n  \"role\": \"model\"\n}",
+        "intermediate_events": null,
+        "agent_data": "{\"agents\": {\"hr_onboarding_workflow\": {\"agent_id\": \"hr_onboarding_workflow\", \"agent_type\": \"Workflow\", \"description\": \"\", \"tools\": [], \"sub_agents\": []}}, \"turns\": [{\"turn_index\": 0, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Start onboarding for Bob Jones, employee_id: emp-789.\"}]}}]}, {\"turn_index\": 1, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Webhook Event: document_signature_timeout for emp-789\"}]}}]}, {\"turn_index\": 2, \"events\": [{\"author\": \"user\", \"content\": {\"parts\": [{\"text\": \"Webhook Event: manual_hr_override for emp-789 (Documents manually collected)\"}]}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"3p8psfbq\", \"args\": {\"employee_id\": \"emp-789\"}, \"name\": \"provision_software_accounts\"}}, {\"function_call\": {\"id\": \"k38na0dw\", \"args\": {\"employee_id\": \"emp-789\"}, \"name\": \"order_hardware\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"3p8psfbq\", \"name\": \"provision_software_accounts\", \"response\": {\"result\": \"{\\\"status\\\": \\\"SUCCESS\\\", \\\"action\\\": \\\"SOFTWARE_PROVISIONED\\\", \\\"employee_id\\\": \\\"emp-789\\\", \\\"message\\\": \\\"All standard software accounts created.\\\"}\"}}}, {\"function_response\": {\"id\": \"k38na0dw\", \"name\": \"order_hardware\", \"response\": {\"result\": \"{\\\"status\\\": \\\"SUCCESS\\\", \\\"action\\\": \\\"HARDWARE_ORDERED\\\", \\\"employee_id\\\": \\\"emp-789\\\", \\\"tracking_id\\\": \\\"HW-789\\\", \\\"message\\\": \\\"Hardware ordered successfully.\\\"}\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_call\": {\"id\": \"z757ox3n\", \"args\": {\"employee_id\": \"emp-789\", \"notes\": \"Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override.\", \"status\": \"AWAITING_HARDWARE_DELIVERY\"}, \"name\": \"set_model_response\"}}], \"role\": \"model\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"function_response\": {\"id\": \"z757ox3n\", \"name\": \"set_model_response\", \"response\": {\"employee_id\": \"emp-789\", \"status\": \"AWAITING_HARDWARE_DELIVERY\", \"notes\": \"Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override.\"}}}], \"role\": \"user\"}}, {\"author\": \"hr_onboarding_coordinator\", \"content\": {\"parts\": [{\"text\": \"{\\\"employee_id\\\": \\\"emp-789\\\", \\\"status\\\": \\\"AWAITING_HARDWARE_DELIVERY\\\", \\\"notes\\\": \\\"Manual HR override received. Software accounts have been provisioned and hardware has been ordered (Tracking ID: HW-789). Now awaiting hardware delivery or manual IT override.\\\"}\"}], \"role\": \"model\"}}]}]}"
+      }
+    ]
+  },
+  "agent_info": null
+}

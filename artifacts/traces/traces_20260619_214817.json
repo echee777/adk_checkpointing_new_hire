@@ -1,0 +1,472 @@
+{
+  "eval_cases": [
+    {
+      "prompt": {
+        "parts": [
+          {
+            "text": "Start onboarding for Jane Doe, employee_id: emp-123."
+          }
+        ],
+        "role": "user"
+      },
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "{\"employee_id\": \"emp-123\", \"status\": \"AWAITING_DOCUMENTS\", \"notes\": \"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\"}"
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "start_onboarding",
+      "agent_data": {
+        "agents": {
+          "hr_onboarding_workflow": {
+            "agent_id": "hr_onboarding_workflow",
+            "agent_type": "Workflow",
+            "description": "",
+            "tools": [],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "turn_id": "turn_0",
+            "events": [
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "fiq3za28",
+                        "args": {
+                          "employee_id": "emp-123",
+                          "name": "Jane Doe"
+                        },
+                        "name": "send_welcome_packet"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "fiq3za28",
+                        "name": "send_welcome_packet",
+                        "response": {
+                          "result": "{\"status\": \"SUCCESS\", \"action\": \"WELCOME_PACKET_SENT\", \"employee_id\": \"emp-123\", \"name\": \"Jane Doe\", \"message\": \"Welcome packet dispatched via DocuSign.\"}"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "w6k8b373",
+                        "args": {
+                          "status": "AWAITING_DOCUMENTS",
+                          "employee_id": "emp-123",
+                          "notes": "Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook."
+                        },
+                        "name": "set_model_response"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "w6k8b373",
+                        "name": "set_model_response",
+                        "response": {
+                          "employee_id": "emp-123",
+                          "status": "AWAITING_DOCUMENTS",
+                          "notes": "Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "{\"employee_id\": \"emp-123\", \"status\": \"AWAITING_DOCUMENTS\", \"notes\": \"Welcome packet sent to Jane Doe (emp-123). Awaiting 'documents_signed' webhook.\"}"
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "{\"employee_id\": \"emp-456\", \"status\": \"WAITING_FOR_HARDWARE_DELIVERY\", \"notes\": \"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\"}"
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "documents_signed_transition",
+      "agent_data": {
+        "agents": {
+          "hr_onboarding_workflow": {
+            "agent_id": "hr_onboarding_workflow",
+            "agent_type": "Workflow",
+            "description": "",
+            "tools": [],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "Start onboarding for John Smith, employee_id: emp-456."
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "args": {
+                          "employee_id": "emp-456"
+                        },
+                        "name": "send_welcome_packet"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "user",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "name": "send_welcome_packet",
+                        "response": {
+                          "status": "SUCCESS"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "Webhook Event: documents_signed for emp-456"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "yh6pdnqc",
+                        "args": {
+                          "employee_id": "emp-456"
+                        },
+                        "name": "provision_software_accounts"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "yh6pdnqc",
+                        "name": "provision_software_accounts",
+                        "response": {
+                          "result": "{\"status\": \"SUCCESS\", \"action\": \"SOFTWARE_PROVISIONED\", \"employee_id\": \"emp-456\", \"message\": \"All standard software accounts created.\"}"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "mkpo7wbn",
+                        "args": {
+                          "employee_id": "emp-456"
+                        },
+                        "name": "order_hardware"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "mkpo7wbn",
+                        "name": "order_hardware",
+                        "response": {
+                          "result": "{\"status\": \"SUCCESS\", \"action\": \"HARDWARE_ORDERED\", \"employee_id\": \"emp-456\", \"tracking_id\": \"HW-456\", \"message\": \"Hardware ordered successfully.\"}"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "ya3heuzg",
+                        "args": {
+                          "notes": "The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.",
+                          "employee_id": "emp-456",
+                          "status": "WAITING_FOR_HARDWARE_DELIVERY"
+                        },
+                        "name": "set_model_response"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "ya3heuzg",
+                        "name": "set_model_response",
+                        "response": {
+                          "employee_id": "emp-456",
+                          "status": "WAITING_FOR_HARDWARE_DELIVERY",
+                          "notes": "The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "{\"employee_id\": \"emp-456\", \"status\": \"WAITING_FOR_HARDWARE_DELIVERY\", \"notes\": \"The webhook event 'documents_signed' was received. Standard software accounts have been provisioned and the laptop/accessories order has been placed (Tracking ID: HW-456). We are now waiting for the hardware delivery webhook (hardware_delivered or manual_it_override) to complete the onboarding process.\"}"
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "responses": [
+        {
+          "response": {
+            "parts": [
+              {
+                "text": "{\"employee_id\": \"emp-789\", \"status\": \"Awaiting HR Intervention\", \"notes\": \"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\"}"
+              }
+            ],
+            "role": "model"
+          }
+        }
+      ],
+      "eval_case_id": "docusign_timeout_transition",
+      "agent_data": {
+        "agents": {
+          "hr_onboarding_workflow": {
+            "agent_id": "hr_onboarding_workflow",
+            "agent_type": "Workflow",
+            "description": "",
+            "tools": [],
+            "sub_agents": []
+          }
+        },
+        "turns": [
+          {
+            "turn_index": 0,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "Start onboarding for Bob Jones, employee_id: emp-789."
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "args": {
+                          "employee_id": "emp-789"
+                        },
+                        "name": "send_welcome_packet"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "user",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "name": "send_welcome_packet",
+                        "response": {
+                          "status": "SUCCESS"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "turn_index": 1,
+            "events": [
+              {
+                "author": "user",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "Webhook Event: document_signature_timeout for emp-789"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "u6yowqot",
+                        "args": {
+                          "status": "Awaiting HR Intervention",
+                          "notes": "Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.",
+                          "employee_id": "emp-789"
+                        },
+                        "name": "set_model_response"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "u6yowqot",
+                        "name": "set_model_response",
+                        "response": {
+                          "employee_id": "emp-789",
+                          "status": "Awaiting HR Intervention",
+                          "notes": "Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              },
+              {
+                "author": "hr_onboarding_coordinator",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "{\"employee_id\": \"emp-789\", \"status\": \"Awaiting HR Intervention\", \"notes\": \"Received document signature timeout. The onboarding process is paused. Waiting for manual HR override or further intervention before we can provision accounts or order hardware.\"}"
+                    }
+                  ],
+                  "role": "model"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

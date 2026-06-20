@@ -1,0 +1,548 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluation Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+    <style>
+        body { font-family: 'Roboto', 'Helvetica', sans-serif; margin: 2em; background-color: #f8f9fa; color: #202124; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+        h1, h2, h3 { color: #3c4043; }
+        h1 { border-bottom: 2px solid #4285F4; padding-bottom: 8px; }
+        h2 { border-bottom: 1px solid #dadce0; padding-bottom: 8px; }
+        table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+        th, td { border: 1px solid #dadce0; padding: 12px; text-align: left; vertical-align: top; }
+        th { background-color: #f2f2f2; font-weight: 500; }
+        details { border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #fff; }
+        summary { font-weight: 500; font-size: 1.1em; cursor: pointer; }
+        .prompt-container { background-color: #e8f0fe; padding: 16px; margin: 12px 0; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+        .reference-container { background-color: #fff; border: 1px solid #dadce0; padding: 16px; margin: 12px 0; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+        .agent-info-container { background-color: #f1f3f4; padding: 16px; margin: 12px 0; border-radius: 8px; word-wrap: break-word; overflow-wrap: break-word; font-size: 14px; }
+        .agent-info-grid { display: grid; grid-template-columns: 120px 1fr; gap: 8px; margin-bottom: 12px; }
+        .agent-info-grid dt { font-weight: 500; color: #3c4043; }
+        .agent-info-grid dd { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+        .intermediate-events-container { background-color: #f1f3f4; padding: 16px; margin: 12px 0; border-radius: 8px; word-wrap: break-word; overflow-wrap: break-word; max-height: 400px; overflow-y: auto; overflow-x: auto; }
+        .response-container { background-color: #f9f9f9; padding: 12px; margin-top: 8px; border-radius: 8px; border: 1px solid #eee; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; }
+        .explanation { color: #5f6368; font-style: italic; font-size: 0.9em; padding-top: 6px; }
+        .raw-json-details summary { font-size: 0.9em; cursor: pointer; color: #5f6368;}
+        .raw-json-container { white-space: pre-wrap; word-wrap: break-word; max-height: 300px; overflow-y: auto; background-color: #f1f1f1; padding: 10px; border-radius: 4px; margin-top: 8px; }
+
+        .rubric-bubble-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .rubric-details { border: none; padding: 0; margin: 0; }
+        .rubric-bubble { display: inline-flex; align-items: center; background-color: #e8f0fe; color: #1967d2; border-radius: 16px; padding: 8px 12px; font-size: 0.9em; cursor: pointer; list-style: none; }
+        .rubric-bubble::-webkit-details-marker { display: none; }
+        .rubric-bubble::before { content: '►'; margin-right: 8px; font-size: 0.8em; transition: transform 0.2s; }
+        .rubric-details[open] > .rubric-bubble::before { transform: rotate(90deg); }
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+
+        .case-content-wrapper { display: flex; gap: 1rem; }
+        .case-content-main { flex: 1; }
+        .case-content-sidebar { flex: 1; min-width: 0; }
+
+        /* Tool Declarations */
+        .tool-declarations-container { background-color: #f1f1f1; padding: 10px; border-radius: 4px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
+        .tool-declaration { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
+        .tool-declaration:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        /* Agent Topology UI */
+        .system-topology-details { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-top: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .system-topology-details > summary { font-size: 1.1em; font-weight: 500; cursor: pointer; outline: none; margin-bottom: 12px; list-style: none; display: flex; align-items: center; color: #3c4043; }
+        .system-topology-details > summary::-webkit-details-marker { display: none; }
+        .system-topology-details > summary::before { content: '▼'; font-size: 0.8em; margin-right: 8px; transition: transform 0.2s; }
+        .system-topology-details:not([open]) > summary::before { transform: rotate(-90deg); }
+
+        .topology-container { background: #f8f9fa; border-radius: 8px; padding: 16px; margin-top: 8px; border: 1px solid #dadce0; overflow-x: auto; }
+        .agent-node { background: #fff; border: 1px solid #dadce0; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); min-width: 300px; max-width: 600px; }
+        .agent-node-header { padding: 10px 16px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 8px; background: #f1f3f4; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+        .agent-name { font-weight: 600; color: #1a73e8; }
+        .agent-type { font-size: 11px; background: #e8eaed; padding: 2px 8px; border-radius: 12px; color: #5f6368; font-family: monospace; }
+        .agent-node-body { padding: 12px 16px; font-size: 13px; color: #3c4043; }
+        .agent-desc { margin-bottom: 8px; }
+        .agent-inst details, .agent-tools details { margin-bottom: 8px; padding: 8px; }
+        .agent-inst summary, .agent-tools summary { cursor: pointer; font-weight: 500; color: #5f6368; font-size: 12px; outline: none; margin-bottom: 0; }
+        .inst-content, .tools-content { margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #eee; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
+        .sub-agents-container { margin-top: 16px; padding-left: 24px; border-left: 2px solid #dadce0; position: relative; }
+        .sub-agents-container::before { content: ''; position: absolute; top: -16px; left: -2px; width: 2px; height: 16px; background: #dadce0; }
+
+        /* Multi-turn Agent Trace UI */
+        .conversation-trace-details { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-top: 0; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .conversation-trace-details > summary { font-size: 1.1em; font-weight: 500; cursor: pointer; outline: none; margin-bottom: 8px; list-style: none; display: flex; align-items: center; color: #3c4043; }
+        .conversation-trace-details > summary::-webkit-details-marker { display: none; }
+        .conversation-trace-details > summary::before { content: '▼'; font-size: 0.8em; margin-right: 8px; transition: transform 0.2s; }
+        .conversation-trace-details:not([open]) > summary::before { transform: rotate(-90deg); }
+
+        .agent-timeline { position: relative; padding-left: 32px; margin-top: 16px; font-family: 'Roboto', sans-serif; }
+        .agent-timeline::before { content: ''; position: absolute; top: 0; bottom: 0; left: 11px; width: 2px; background: #e8eaed; }
+
+        .turn-details { margin-bottom: 16px; padding: 0; border: none; }
+        .turn-summary { list-style: none; outline: none; cursor: pointer; display: block; margin-left: -32px; padding-left: 32px; }
+        .turn-summary::-webkit-details-marker { display: none; }
+        .turn-header { margin: 16px 0 16px -32px; position: relative; z-index: 1; display: inline-flex; align-items: center; }
+
+        .turn-badge { display: inline-flex; align-items: center; background: #f8f9fa; color: #5f6368; padding: 4px 12px; border-radius: 16px; font-size: 11px; font-weight: 600; border: 1px solid #dadce0; letter-spacing: 0.5px; }
+        .turn-divider { color: #dadce0; margin: 0 6px; font-weight: normal; }
+        .turn-badge::before { content: '▼'; margin-right: 6px; font-size: 0.8em; display: inline-block; transition: transform 0.2s; }
+        .turn-details:not([open]) .turn-badge::before { transform: rotate(-90deg); }
+
+        .timeline-item { position: relative; margin-bottom: 16px; }
+        .timeline-icon { position: absolute; left: -32px; top: 0; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #e8f0fe; border: 2px solid #fff; color: #1a73e8; z-index: 1; box-sizing: border-box; margin-left: 0; }
+        .timeline-icon.user { background: #f3e8fd; color: #9334e6; }
+        .timeline-icon.tool { background: #e6f4ea; color: #1e8e3e; }
+        .timeline-content { background: #fff; border: 1px solid #dadce0; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); overflow: hidden; }
+        .event-header { padding: 12px 16px 8px; font-size: 12px; font-weight: 600; display: flex; align-items: baseline; gap: 8px; }
+        .event-author { color: #1a73e8; letter-spacing: 0.5px; text-transform: uppercase; }
+        .event-author.user { color: #9334e6; }
+        .event-author.tool { color: #1e8e3e; }
+        .event-role { color: #80868b; font-weight: normal; font-size: 11px; font-family: monospace;}
+        .event-body { padding: 0 16px 12px; font-size: 14px; color: #202124; line-height: 1.5; }
+        .dark-code-block { background: #0e111a; color: #d4d4d4; padding: 12px; border-radius: 6px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; margin: 8px 0 0 0; overflow-x: auto; border: 1px solid #3c4043; }
+        .function-call-title { color: #e37400; font-weight: 600; font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+        .function-response-title { color: #0f9d58; font-weight: 600; font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+        .agent-trace-container { max-height: 600px; overflow-x: auto; overflow-y: auto; padding-right: 8px; border: 1px solid #eee; padding: 12px; border-radius: 8px; background: #fafafa; }
+
+        /* Collapsible Metrics */
+        .metric-details { background: #fff; border: 1px solid #dadce0; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); overflow: hidden; }
+        .metric-summary { list-style: none; cursor: pointer; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; margin: 0; outline: none; }
+        .metric-summary::-webkit-details-marker { display: none; }
+        .metric-details[open] .metric-summary { border-bottom: 1px solid #dadce0; }
+        .metric-name-wrapper { display: flex; align-items: center; font-weight: 600; color: #3c4043; font-size: 14px; }
+        .metric-name-wrapper::before { content: '►'; font-size: 0.8em; margin-right: 8px; transition: transform 0.2s; color: #5f6368; }
+        .metric-details[open] .metric-name-wrapper::before { transform: rotate(90deg); }
+        .metric-score { font-weight: bold; font-size: 16px; color: #1a73e8; }
+        .metric-body { padding: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Evaluation Report</h1>
+        <div id="summary-section"></div>
+        <div id="details-section"></div>
+    </div>
+    <script>
+        var vizData_vertex_eval_sdk = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob("eyJldmFsX2Nhc2VfcmVzdWx0cyI6IFt7ImV2YWxfY2FzZV9pbmRleCI6IDAsICJyZXNwb25zZV9jYW5kaWRhdGVfcmVzdWx0cyI6IFt7InJlc3BvbnNlX2luZGV4IjogMCwgIm1ldHJpY19yZXN1bHRzIjogeyJkZXRlcm1pbmlzdGljX3Rhc2tfc3VjY2VzcyI6IHsibWV0cmljX25hbWUiOiAiZGV0ZXJtaW5pc3RpY190YXNrX3N1Y2Nlc3MiLCAic2NvcmUiOiAxLjAsICJleHBsYW5hdGlvbiI6ICJNaXNzaW5nIHNlbmRfd2VsY29tZV9wYWNrZXQgb24gdHVybiAwIiwgInJ1YnJpY192ZXJkaWN0cyI6IG51bGwsICJyYXdfb3V0cHV0IjogbnVsbCwgImVycm9yX21lc3NhZ2UiOiBudWxsfX19XX0sIHsiZXZhbF9jYXNlX2luZGV4IjogMSwgInJlc3BvbnNlX2NhbmRpZGF0ZV9yZXN1bHRzIjogW3sicmVzcG9uc2VfaW5kZXgiOiAwLCAibWV0cmljX3Jlc3VsdHMiOiB7ImRldGVybWluaXN0aWNfdGFza19zdWNjZXNzIjogeyJtZXRyaWNfbmFtZSI6ICJkZXRlcm1pbmlzdGljX3Rhc2tfc3VjY2VzcyIsICJzY29yZSI6IDEuMCwgImV4cGxhbmF0aW9uIjogIk1pc3Npbmcgc2VuZF93ZWxjb21lX3BhY2tldCBvbiB0dXJuIDAiLCAicnVicmljX3ZlcmRpY3RzIjogbnVsbCwgInJhd19vdXRwdXQiOiBudWxsLCAiZXJyb3JfbWVzc2FnZSI6IG51bGx9fX1dfSwgeyJldmFsX2Nhc2VfaW5kZXgiOiAyLCAicmVzcG9uc2VfY2FuZGlkYXRlX3Jlc3VsdHMiOiBbeyJyZXNwb25zZV9pbmRleCI6IDAsICJtZXRyaWNfcmVzdWx0cyI6IHsiZGV0ZXJtaW5pc3RpY190YXNrX3N1Y2Nlc3MiOiB7Im1ldHJpY19uYW1lIjogImRldGVybWluaXN0aWNfdGFza19zdWNjZXNzIiwgInNjb3JlIjogMS4wLCAiZXhwbGFuYXRpb24iOiAiTWlzc2luZyBzZW5kX3dlbGNvbWVfcGFja2V0IG9uIHR1cm4gMCIsICJydWJyaWNfdmVyZGljdHMiOiBudWxsLCAicmF3X291dHB1dCI6IG51bGwsICJlcnJvcl9tZXNzYWdlIjogbnVsbH19fV19XSwgInN1bW1hcnlfbWV0cmljcyI6IFt7Im1ldHJpY19uYW1lIjogImRldGVybWluaXN0aWNfdGFza19zdWNjZXNzIiwgIm51bV9jYXNlc190b3RhbCI6IDMsICJudW1fY2FzZXNfdmFsaWQiOiAzLCAibnVtX2Nhc2VzX2Vycm9yIjogMCwgIm1lYW5fc2NvcmUiOiAxLjAsICJzdGRldl9zY29yZSI6IDAuMCwgInBhc3NfcmF0ZSI6IG51bGx9XSwgIndpbl9yYXRlcyI6IG51bGwsICJldmFsdWF0aW9uX2RhdGFzZXQiOiBbeyJiaWdxdWVyeV9zb3VyY2UiOiBudWxsLCAiZ2NzX3NvdXJjZSI6IG51bGwsICJldmFsX2Nhc2VzIjogW3sicHJvbXB0IjogbnVsbCwgInJlc3BvbnNlcyI6IFt7InJlc3BvbnNlIjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogIntcImVtcGxveWVlX2lkXCI6IFwidW5rbm93blwiLCBcInN0YXR1c1wiOiBcIkNPTVBMRVRFXCIsIFwibm90ZXNcIjogXCJIYXJkd2FyZSBkZWxpdmVyZWQgc3VjY2Vzc2Z1bGx5IChUcmFja2luZyBJRDogSFctOTk5KS4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuXCJ9IiwgInRob3VnaHQiOiBudWxsLCAidGhvdWdodF9zaWduYXR1cmUiOiBudWxsLCAidmlkZW9fbWV0YWRhdGEiOiBudWxsLCAidG9vbF9jYWxsIjogbnVsbCwgInRvb2xfcmVzcG9uc2UiOiBudWxsLCAicGFydF9tZXRhZGF0YSI6IG51bGx9XSwgInJvbGUiOiAibW9kZWwifX1dLCAicmVmZXJlbmNlIjogbnVsbCwgInN5c3RlbV9pbnN0cnVjdGlvbiI6IG51bGwsICJjb252ZXJzYXRpb25faGlzdG9yeSI6IG51bGwsICJydWJyaWNfZ3JvdXBzIjogbnVsbCwgImV2YWxfY2FzZV9pZCI6ICJoYXBweV9wYXRoX29uYm9hcmRpbmciLCAiaW50ZXJtZWRpYXRlX2V2ZW50cyI6IG51bGwsICJhZ2VudF9pbmZvIjogbnVsbCwgImFnZW50X2RhdGEiOiB7ImFnZW50cyI6IHsiaHJfb25ib2FyZGluZ193b3JrZmxvdyI6IHsiYWdlbnRfaWQiOiAiaHJfb25ib2FyZGluZ193b3JrZmxvdyIsICJhZ2VudF90eXBlIjogIldvcmtmbG93IiwgImRlc2NyaXB0aW9uIjogIiIsICJpbnN0cnVjdGlvbiI6IG51bGwsICJ0b29scyI6IFtdLCAic3ViX2FnZW50cyI6IFtdfX0sICJ0dXJucyI6IFt7InR1cm5faW5kZXgiOiAwLCAidHVybl9pZCI6IG51bGwsICJldmVudHMiOiBbeyJhdXRob3IiOiAidXNlciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogIlN0YXJ0IG9uYm9hcmRpbmcgZm9yIEphbmUgRG9lLCBlbXBsb3llZV9pZDogZW1wLTEyMy4iLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6IG51bGx9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfV19LCB7InR1cm5faW5kZXgiOiAxLCAidHVybl9pZCI6IG51bGwsICJldmVudHMiOiBbeyJhdXRob3IiOiAidXNlciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogIldlYmhvb2sgRXZlbnQ6IGRvY3VtZW50c19zaWduZWQgZm9yIGVtcC0xMjMiLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6IG51bGx9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfV19LCB7InR1cm5faW5kZXgiOiAyLCAidHVybl9pZCI6IG51bGwsICJldmVudHMiOiBbeyJhdXRob3IiOiAidXNlciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogIldlYmhvb2sgRXZlbnQ6IGhhcmR3YXJlX2RlbGl2ZXJlZCBmb3IgdHJhY2tpbmcgSUQgSFctOTk5IiwgInRob3VnaHQiOiBudWxsLCAidGhvdWdodF9zaWduYXR1cmUiOiBudWxsLCAidmlkZW9fbWV0YWRhdGEiOiBudWxsLCAidG9vbF9jYWxsIjogbnVsbCwgInRvb2xfcmVzcG9uc2UiOiBudWxsLCAicGFydF9tZXRhZGF0YSI6IG51bGx9XSwgInJvbGUiOiBudWxsfSwgImV2ZW50X3RpbWUiOiBudWxsLCAic3RhdGVfZGVsdGEiOiBudWxsLCAiYWN0aXZlX3Rvb2xzIjogbnVsbH0sIHsiYXV0aG9yIjogImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3IiLCAiY29udGVudCI6IHsicGFydHMiOiBbeyJtZWRpYV9yZXNvbHV0aW9uIjogbnVsbCwgImNvZGVfZXhlY3V0aW9uX3Jlc3VsdCI6IG51bGwsICJleGVjdXRhYmxlX2NvZGUiOiBudWxsLCAiZmlsZV9kYXRhIjogbnVsbCwgImZ1bmN0aW9uX2NhbGwiOiB7ImlkIjogImxsMGJyd2o2IiwgImFyZ3MiOiB7Im5vdGVzIjogIkhhcmR3YXJlIGRlbGl2ZXJlZCBzdWNjZXNzZnVsbHkgKFRyYWNraW5nIElEOiBIVy05OTkpLiBPbmJvYXJkaW5nIGlzIG5vdyBjb21wbGV0ZS4iLCAic3RhdHVzIjogIkNPTVBMRVRFIiwgImVtcGxveWVlX2lkIjogInVua25vd24ifSwgIm5hbWUiOiAic2V0X21vZGVsX3Jlc3BvbnNlIiwgInBhcnRpYWxfYXJncyI6IG51bGwsICJ3aWxsX2NvbnRpbnVlIjogbnVsbH0sICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogbnVsbCwgInRob3VnaHQiOiBudWxsLCAidGhvdWdodF9zaWduYXR1cmUiOiBudWxsLCAidmlkZW9fbWV0YWRhdGEiOiBudWxsLCAidG9vbF9jYWxsIjogbnVsbCwgInRvb2xfcmVzcG9uc2UiOiBudWxsLCAicGFydF9tZXRhZGF0YSI6IG51bGx9XSwgInJvbGUiOiAibW9kZWwifSwgImV2ZW50X3RpbWUiOiBudWxsLCAic3RhdGVfZGVsdGEiOiBudWxsLCAiYWN0aXZlX3Rvb2xzIjogbnVsbH0sIHsiYXV0aG9yIjogImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3IiLCAiY29udGVudCI6IHsicGFydHMiOiBbeyJtZWRpYV9yZXNvbHV0aW9uIjogbnVsbCwgImNvZGVfZXhlY3V0aW9uX3Jlc3VsdCI6IG51bGwsICJleGVjdXRhYmxlX2NvZGUiOiBudWxsLCAiZmlsZV9kYXRhIjogbnVsbCwgImZ1bmN0aW9uX2NhbGwiOiBudWxsLCAiZnVuY3Rpb25fcmVzcG9uc2UiOiB7IndpbGxfY29udGludWUiOiBudWxsLCAic2NoZWR1bGluZyI6IG51bGwsICJwYXJ0cyI6IG51bGwsICJpZCI6ICJsbDBicndqNiIsICJuYW1lIjogInNldF9tb2RlbF9yZXNwb25zZSIsICJyZXNwb25zZSI6IHsiZW1wbG95ZWVfaWQiOiAidW5rbm93biIsICJzdGF0dXMiOiAiQ09NUExFVEUiLCAibm90ZXMiOiAiSGFyZHdhcmUgZGVsaXZlcmVkIHN1Y2Nlc3NmdWxseSAoVHJhY2tpbmcgSUQ6IEhXLTk5OSkuIE9uYm9hcmRpbmcgaXMgbm93IGNvbXBsZXRlLiJ9fSwgImlubGluZV9kYXRhIjogbnVsbCwgInRleHQiOiBudWxsLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6ICJ1c2VyIn0sICJldmVudF90aW1lIjogbnVsbCwgInN0YXRlX2RlbHRhIjogbnVsbCwgImFjdGl2ZV90b29scyI6IG51bGx9LCB7ImF1dGhvciI6ICJocl9vbmJvYXJkaW5nX2Nvb3JkaW5hdG9yIiwgImNvbnRlbnQiOiB7InBhcnRzIjogW3sibWVkaWFfcmVzb2x1dGlvbiI6IG51bGwsICJjb2RlX2V4ZWN1dGlvbl9yZXN1bHQiOiBudWxsLCAiZXhlY3V0YWJsZV9jb2RlIjogbnVsbCwgImZpbGVfZGF0YSI6IG51bGwsICJmdW5jdGlvbl9jYWxsIjogbnVsbCwgImZ1bmN0aW9uX3Jlc3BvbnNlIjogbnVsbCwgImlubGluZV9kYXRhIjogbnVsbCwgInRleHQiOiAie1wiZW1wbG95ZWVfaWRcIjogXCJ1bmtub3duXCIsIFwic3RhdHVzXCI6IFwiQ09NUExFVEVcIiwgXCJub3Rlc1wiOiBcIkhhcmR3YXJlIGRlbGl2ZXJlZCBzdWNjZXNzZnVsbHkgKFRyYWNraW5nIElEOiBIVy05OTkpLiBPbmJvYXJkaW5nIGlzIG5vdyBjb21wbGV0ZS5cIn0iLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6ICJtb2RlbCJ9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfV19XX0sICJ1c2VyX3NjZW5hcmlvIjogbnVsbH0sIHsicHJvbXB0IjogbnVsbCwgInJlc3BvbnNlcyI6IFt7InJlc3BvbnNlIjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogIntcImVtcGxveWVlX2lkXCI6IFwiZW1wLTQ1NlwiLCBcInN0YXR1c1wiOiBcIkNPTVBMRVRFXCIsIFwibm90ZXNcIjogXCJSZWNlaXZlZCBtYW51YWwgSVQgb3ZlcnJpZGUgd2ViaG9vay4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuXCJ9IiwgInRob3VnaHQiOiBudWxsLCAidGhvdWdodF9zaWduYXR1cmUiOiBudWxsLCAidmlkZW9fbWV0YWRhdGEiOiBudWxsLCAidG9vbF9jYWxsIjogbnVsbCwgInRvb2xfcmVzcG9uc2UiOiBudWxsLCAicGFydF9tZXRhZGF0YSI6IG51bGx9XSwgInJvbGUiOiAibW9kZWwifX1dLCAicmVmZXJlbmNlIjogbnVsbCwgInN5c3RlbV9pbnN0cnVjdGlvbiI6IG51bGwsICJjb252ZXJzYXRpb25faGlzdG9yeSI6IG51bGwsICJydWJyaWNfZ3JvdXBzIjogbnVsbCwgImV2YWxfY2FzZV9pZCI6ICJpdF9wcm92aXNpb25pbmdfZmFpbHVyZV9wYXRoIiwgImludGVybWVkaWF0ZV9ldmVudHMiOiBudWxsLCAiYWdlbnRfaW5mbyI6IG51bGwsICJhZ2VudF9kYXRhIjogeyJhZ2VudHMiOiB7ImhyX29uYm9hcmRpbmdfd29ya2Zsb3ciOiB7ImFnZW50X2lkIjogImhyX29uYm9hcmRpbmdfd29ya2Zsb3ciLCAiYWdlbnRfdHlwZSI6ICJXb3JrZmxvdyIsICJkZXNjcmlwdGlvbiI6ICIiLCAiaW5zdHJ1Y3Rpb24iOiBudWxsLCAidG9vbHMiOiBbXSwgInN1Yl9hZ2VudHMiOiBbXX19LCAidHVybnMiOiBbeyJ0dXJuX2luZGV4IjogMCwgInR1cm5faWQiOiBudWxsLCAiZXZlbnRzIjogW3siYXV0aG9yIjogInVzZXIiLCAiY29udGVudCI6IHsicGFydHMiOiBbeyJtZWRpYV9yZXNvbHV0aW9uIjogbnVsbCwgImNvZGVfZXhlY3V0aW9uX3Jlc3VsdCI6IG51bGwsICJleGVjdXRhYmxlX2NvZGUiOiBudWxsLCAiZmlsZV9kYXRhIjogbnVsbCwgImZ1bmN0aW9uX2NhbGwiOiBudWxsLCAiZnVuY3Rpb25fcmVzcG9uc2UiOiBudWxsLCAiaW5saW5lX2RhdGEiOiBudWxsLCAidGV4dCI6ICJTdGFydCBvbmJvYXJkaW5nIGZvciBKb2huIFNtaXRoLCBlbXBsb3llZV9pZDogZW1wLTQ1Ni4iLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6IG51bGx9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfV19LCB7InR1cm5faW5kZXgiOiAxLCAidHVybl9pZCI6IG51bGwsICJldmVudHMiOiBbeyJhdXRob3IiOiAidXNlciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogIldlYmhvb2sgRXZlbnQ6IGRvY3VtZW50c19zaWduZWQgZm9yIGVtcC00NTYiLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6IG51bGx9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfV19LCB7InR1cm5faW5kZXgiOiAyLCAidHVybl9pZCI6IG51bGwsICJldmVudHMiOiBbeyJhdXRob3IiOiAidXNlciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogIldlYmhvb2sgRXZlbnQ6IG1hbnVhbF9pdF9vdmVycmlkZSBmb3IgZW1wLTQ1NiAoSVQgcHJvdmlzaW9uZWQgbWFudWFsbHkgYWZ0ZXIgZmFpbHVyZSkiLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6IG51bGx9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfSwgeyJhdXRob3IiOiAiaHJfb25ib2FyZGluZ19jb29yZGluYXRvciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IHsiaWQiOiAiZTRydnhkcWoiLCAiYXJncyI6IHsibm90ZXMiOiAiUmVjZWl2ZWQgbWFudWFsIElUIG92ZXJyaWRlIHdlYmhvb2suIE9uYm9hcmRpbmcgaXMgbm93IGNvbXBsZXRlLiIsICJlbXBsb3llZV9pZCI6ICJlbXAtNDU2IiwgInN0YXR1cyI6ICJDT01QTEVURSJ9LCAibmFtZSI6ICJzZXRfbW9kZWxfcmVzcG9uc2UiLCAicGFydGlhbF9hcmdzIjogbnVsbCwgIndpbGxfY29udGludWUiOiBudWxsfSwgImZ1bmN0aW9uX3Jlc3BvbnNlIjogbnVsbCwgImlubGluZV9kYXRhIjogbnVsbCwgInRleHQiOiBudWxsLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6ICJtb2RlbCJ9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfSwgeyJhdXRob3IiOiAiaHJfb25ib2FyZGluZ19jb29yZGluYXRvciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IHsid2lsbF9jb250aW51ZSI6IG51bGwsICJzY2hlZHVsaW5nIjogbnVsbCwgInBhcnRzIjogbnVsbCwgImlkIjogImU0cnZ4ZHFqIiwgIm5hbWUiOiAic2V0X21vZGVsX3Jlc3BvbnNlIiwgInJlc3BvbnNlIjogeyJlbXBsb3llZV9pZCI6ICJlbXAtNDU2IiwgInN0YXR1cyI6ICJDT01QTEVURSIsICJub3RlcyI6ICJSZWNlaXZlZCBtYW51YWwgSVQgb3ZlcnJpZGUgd2ViaG9vay4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuIn19LCAiaW5saW5lX2RhdGEiOiBudWxsLCAidGV4dCI6IG51bGwsICJ0aG91Z2h0IjogbnVsbCwgInRob3VnaHRfc2lnbmF0dXJlIjogbnVsbCwgInZpZGVvX21ldGFkYXRhIjogbnVsbCwgInRvb2xfY2FsbCI6IG51bGwsICJ0b29sX3Jlc3BvbnNlIjogbnVsbCwgInBhcnRfbWV0YWRhdGEiOiBudWxsfV0sICJyb2xlIjogInVzZXIifSwgImV2ZW50X3RpbWUiOiBudWxsLCAic3RhdGVfZGVsdGEiOiBudWxsLCAiYWN0aXZlX3Rvb2xzIjogbnVsbH0sIHsiYXV0aG9yIjogImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3IiLCAiY29udGVudCI6IHsicGFydHMiOiBbeyJtZWRpYV9yZXNvbHV0aW9uIjogbnVsbCwgImNvZGVfZXhlY3V0aW9uX3Jlc3VsdCI6IG51bGwsICJleGVjdXRhYmxlX2NvZGUiOiBudWxsLCAiZmlsZV9kYXRhIjogbnVsbCwgImZ1bmN0aW9uX2NhbGwiOiBudWxsLCAiZnVuY3Rpb25fcmVzcG9uc2UiOiBudWxsLCAiaW5saW5lX2RhdGEiOiBudWxsLCAidGV4dCI6ICJ7XCJlbXBsb3llZV9pZFwiOiBcImVtcC00NTZcIiwgXCJzdGF0dXNcIjogXCJDT01QTEVURVwiLCBcIm5vdGVzXCI6IFwiUmVjZWl2ZWQgbWFudWFsIElUIG92ZXJyaWRlIHdlYmhvb2suIE9uYm9hcmRpbmcgaXMgbm93IGNvbXBsZXRlLlwifSIsICJ0aG91Z2h0IjogbnVsbCwgInRob3VnaHRfc2lnbmF0dXJlIjogbnVsbCwgInZpZGVvX21ldGFkYXRhIjogbnVsbCwgInRvb2xfY2FsbCI6IG51bGwsICJ0b29sX3Jlc3BvbnNlIjogbnVsbCwgInBhcnRfbWV0YWRhdGEiOiBudWxsfV0sICJyb2xlIjogIm1vZGVsIn0sICJldmVudF90aW1lIjogbnVsbCwgInN0YXRlX2RlbHRhIjogbnVsbCwgImFjdGl2ZV90b29scyI6IG51bGx9XX1dfSwgInVzZXJfc2NlbmFyaW8iOiBudWxsfSwgeyJwcm9tcHQiOiBudWxsLCAicmVzcG9uc2VzIjogW3sicmVzcG9uc2UiOiB7InBhcnRzIjogW3sibWVkaWFfcmVzb2x1dGlvbiI6IG51bGwsICJjb2RlX2V4ZWN1dGlvbl9yZXN1bHQiOiBudWxsLCAiZXhlY3V0YWJsZV9jb2RlIjogbnVsbCwgImZpbGVfZGF0YSI6IG51bGwsICJmdW5jdGlvbl9jYWxsIjogbnVsbCwgImZ1bmN0aW9uX3Jlc3BvbnNlIjogbnVsbCwgImlubGluZV9kYXRhIjogbnVsbCwgInRleHQiOiAie1wiZW1wbG95ZWVfaWRcIjogXCJlbXAtNzg5XCIsIFwic3RhdHVzXCI6IFwiQVdBSVRJTkdfSEFSRFdBUkVfREVMSVZFUllcIiwgXCJub3Rlc1wiOiBcIk1hbnVhbCBIUiBvdmVycmlkZSByZWNlaXZlZC4gU29mdHdhcmUgYWNjb3VudHMgaGF2ZSBiZWVuIHByb3Zpc2lvbmVkIGFuZCBoYXJkd2FyZSBoYXMgYmVlbiBvcmRlcmVkIChUcmFja2luZyBJRDogSFctNzg5KS4gTm93IGF3YWl0aW5nIGhhcmR3YXJlIGRlbGl2ZXJ5IG9yIG1hbnVhbCBJVCBvdmVycmlkZS5cIn0iLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6ICJtb2RlbCJ9fV0sICJyZWZlcmVuY2UiOiBudWxsLCAic3lzdGVtX2luc3RydWN0aW9uIjogbnVsbCwgImNvbnZlcnNhdGlvbl9oaXN0b3J5IjogbnVsbCwgInJ1YnJpY19ncm91cHMiOiBudWxsLCAiZXZhbF9jYXNlX2lkIjogImRvY3VzaWduX3RpbWVvdXRfcGF0aCIsICJpbnRlcm1lZGlhdGVfZXZlbnRzIjogbnVsbCwgImFnZW50X2luZm8iOiBudWxsLCAiYWdlbnRfZGF0YSI6IHsiYWdlbnRzIjogeyJocl9vbmJvYXJkaW5nX3dvcmtmbG93IjogeyJhZ2VudF9pZCI6ICJocl9vbmJvYXJkaW5nX3dvcmtmbG93IiwgImFnZW50X3R5cGUiOiAiV29ya2Zsb3ciLCAiZGVzY3JpcHRpb24iOiAiIiwgImluc3RydWN0aW9uIjogbnVsbCwgInRvb2xzIjogW10sICJzdWJfYWdlbnRzIjogW119fSwgInR1cm5zIjogW3sidHVybl9pbmRleCI6IDAsICJ0dXJuX2lkIjogbnVsbCwgImV2ZW50cyI6IFt7ImF1dGhvciI6ICJ1c2VyIiwgImNvbnRlbnQiOiB7InBhcnRzIjogW3sibWVkaWFfcmVzb2x1dGlvbiI6IG51bGwsICJjb2RlX2V4ZWN1dGlvbl9yZXN1bHQiOiBudWxsLCAiZXhlY3V0YWJsZV9jb2RlIjogbnVsbCwgImZpbGVfZGF0YSI6IG51bGwsICJmdW5jdGlvbl9jYWxsIjogbnVsbCwgImZ1bmN0aW9uX3Jlc3BvbnNlIjogbnVsbCwgImlubGluZV9kYXRhIjogbnVsbCwgInRleHQiOiAiU3RhcnQgb25ib2FyZGluZyBmb3IgQm9iIEpvbmVzLCBlbXBsb3llZV9pZDogZW1wLTc4OS4iLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6IG51bGx9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfV19LCB7InR1cm5faW5kZXgiOiAxLCAidHVybl9pZCI6IG51bGwsICJldmVudHMiOiBbeyJhdXRob3IiOiAidXNlciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogIldlYmhvb2sgRXZlbnQ6IGRvY3VtZW50X3NpZ25hdHVyZV90aW1lb3V0IGZvciBlbXAtNzg5IiwgInRob3VnaHQiOiBudWxsLCAidGhvdWdodF9zaWduYXR1cmUiOiBudWxsLCAidmlkZW9fbWV0YWRhdGEiOiBudWxsLCAidG9vbF9jYWxsIjogbnVsbCwgInRvb2xfcmVzcG9uc2UiOiBudWxsLCAicGFydF9tZXRhZGF0YSI6IG51bGx9XSwgInJvbGUiOiBudWxsfSwgImV2ZW50X3RpbWUiOiBudWxsLCAic3RhdGVfZGVsdGEiOiBudWxsLCAiYWN0aXZlX3Rvb2xzIjogbnVsbH1dfSwgeyJ0dXJuX2luZGV4IjogMiwgInR1cm5faWQiOiBudWxsLCAiZXZlbnRzIjogW3siYXV0aG9yIjogInVzZXIiLCAiY29udGVudCI6IHsicGFydHMiOiBbeyJtZWRpYV9yZXNvbHV0aW9uIjogbnVsbCwgImNvZGVfZXhlY3V0aW9uX3Jlc3VsdCI6IG51bGwsICJleGVjdXRhYmxlX2NvZGUiOiBudWxsLCAiZmlsZV9kYXRhIjogbnVsbCwgImZ1bmN0aW9uX2NhbGwiOiBudWxsLCAiZnVuY3Rpb25fcmVzcG9uc2UiOiBudWxsLCAiaW5saW5lX2RhdGEiOiBudWxsLCAidGV4dCI6ICJXZWJob29rIEV2ZW50OiBtYW51YWxfaHJfb3ZlcnJpZGUgZm9yIGVtcC03ODkgKERvY3VtZW50cyBtYW51YWxseSBjb2xsZWN0ZWQpIiwgInRob3VnaHQiOiBudWxsLCAidGhvdWdodF9zaWduYXR1cmUiOiBudWxsLCAidmlkZW9fbWV0YWRhdGEiOiBudWxsLCAidG9vbF9jYWxsIjogbnVsbCwgInRvb2xfcmVzcG9uc2UiOiBudWxsLCAicGFydF9tZXRhZGF0YSI6IG51bGx9XSwgInJvbGUiOiBudWxsfSwgImV2ZW50X3RpbWUiOiBudWxsLCAic3RhdGVfZGVsdGEiOiBudWxsLCAiYWN0aXZlX3Rvb2xzIjogbnVsbH0sIHsiYXV0aG9yIjogImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3IiLCAiY29udGVudCI6IHsicGFydHMiOiBbeyJtZWRpYV9yZXNvbHV0aW9uIjogbnVsbCwgImNvZGVfZXhlY3V0aW9uX3Jlc3VsdCI6IG51bGwsICJleGVjdXRhYmxlX2NvZGUiOiBudWxsLCAiZmlsZV9kYXRhIjogbnVsbCwgImZ1bmN0aW9uX2NhbGwiOiB7ImlkIjogIjNwOHBzZmJxIiwgImFyZ3MiOiB7ImVtcGxveWVlX2lkIjogImVtcC03ODkifSwgIm5hbWUiOiAicHJvdmlzaW9uX3NvZnR3YXJlX2FjY291bnRzIiwgInBhcnRpYWxfYXJncyI6IG51bGwsICJ3aWxsX2NvbnRpbnVlIjogbnVsbH0sICJmdW5jdGlvbl9yZXNwb25zZSI6IG51bGwsICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogbnVsbCwgInRob3VnaHQiOiBudWxsLCAidGhvdWdodF9zaWduYXR1cmUiOiBudWxsLCAidmlkZW9fbWV0YWRhdGEiOiBudWxsLCAidG9vbF9jYWxsIjogbnVsbCwgInRvb2xfcmVzcG9uc2UiOiBudWxsLCAicGFydF9tZXRhZGF0YSI6IG51bGx9LCB7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IHsiaWQiOiAiazM4bmEwZHciLCAiYXJncyI6IHsiZW1wbG95ZWVfaWQiOiAiZW1wLTc4OSJ9LCAibmFtZSI6ICJvcmRlcl9oYXJkd2FyZSIsICJwYXJ0aWFsX2FyZ3MiOiBudWxsLCAid2lsbF9jb250aW51ZSI6IG51bGx9LCAiZnVuY3Rpb25fcmVzcG9uc2UiOiBudWxsLCAiaW5saW5lX2RhdGEiOiBudWxsLCAidGV4dCI6IG51bGwsICJ0aG91Z2h0IjogbnVsbCwgInRob3VnaHRfc2lnbmF0dXJlIjogbnVsbCwgInZpZGVvX21ldGFkYXRhIjogbnVsbCwgInRvb2xfY2FsbCI6IG51bGwsICJ0b29sX3Jlc3BvbnNlIjogbnVsbCwgInBhcnRfbWV0YWRhdGEiOiBudWxsfV0sICJyb2xlIjogIm1vZGVsIn0sICJldmVudF90aW1lIjogbnVsbCwgInN0YXRlX2RlbHRhIjogbnVsbCwgImFjdGl2ZV90b29scyI6IG51bGx9LCB7ImF1dGhvciI6ICJocl9vbmJvYXJkaW5nX2Nvb3JkaW5hdG9yIiwgImNvbnRlbnQiOiB7InBhcnRzIjogW3sibWVkaWFfcmVzb2x1dGlvbiI6IG51bGwsICJjb2RlX2V4ZWN1dGlvbl9yZXN1bHQiOiBudWxsLCAiZXhlY3V0YWJsZV9jb2RlIjogbnVsbCwgImZpbGVfZGF0YSI6IG51bGwsICJmdW5jdGlvbl9jYWxsIjogbnVsbCwgImZ1bmN0aW9uX3Jlc3BvbnNlIjogeyJ3aWxsX2NvbnRpbnVlIjogbnVsbCwgInNjaGVkdWxpbmciOiBudWxsLCAicGFydHMiOiBudWxsLCAiaWQiOiAiM3A4cHNmYnEiLCAibmFtZSI6ICJwcm92aXNpb25fc29mdHdhcmVfYWNjb3VudHMiLCAicmVzcG9uc2UiOiB7InJlc3VsdCI6ICJ7XCJzdGF0dXNcIjogXCJTVUNDRVNTXCIsIFwiYWN0aW9uXCI6IFwiU09GVFdBUkVfUFJPVklTSU9ORURcIiwgXCJlbXBsb3llZV9pZFwiOiBcImVtcC03ODlcIiwgXCJtZXNzYWdlXCI6IFwiQWxsIHN0YW5kYXJkIHNvZnR3YXJlIGFjY291bnRzIGNyZWF0ZWQuXCJ9In19LCAiaW5saW5lX2RhdGEiOiBudWxsLCAidGV4dCI6IG51bGwsICJ0aG91Z2h0IjogbnVsbCwgInRob3VnaHRfc2lnbmF0dXJlIjogbnVsbCwgInZpZGVvX21ldGFkYXRhIjogbnVsbCwgInRvb2xfY2FsbCI6IG51bGwsICJ0b29sX3Jlc3BvbnNlIjogbnVsbCwgInBhcnRfbWV0YWRhdGEiOiBudWxsfSwgeyJtZWRpYV9yZXNvbHV0aW9uIjogbnVsbCwgImNvZGVfZXhlY3V0aW9uX3Jlc3VsdCI6IG51bGwsICJleGVjdXRhYmxlX2NvZGUiOiBudWxsLCAiZmlsZV9kYXRhIjogbnVsbCwgImZ1bmN0aW9uX2NhbGwiOiBudWxsLCAiZnVuY3Rpb25fcmVzcG9uc2UiOiB7IndpbGxfY29udGludWUiOiBudWxsLCAic2NoZWR1bGluZyI6IG51bGwsICJwYXJ0cyI6IG51bGwsICJpZCI6ICJrMzhuYTBkdyIsICJuYW1lIjogIm9yZGVyX2hhcmR3YXJlIiwgInJlc3BvbnNlIjogeyJyZXN1bHQiOiAie1wic3RhdHVzXCI6IFwiU1VDQ0VTU1wiLCBcImFjdGlvblwiOiBcIkhBUkRXQVJFX09SREVSRURcIiwgXCJlbXBsb3llZV9pZFwiOiBcImVtcC03ODlcIiwgXCJ0cmFja2luZ19pZFwiOiBcIkhXLTc4OVwiLCBcIm1lc3NhZ2VcIjogXCJIYXJkd2FyZSBvcmRlcmVkIHN1Y2Nlc3NmdWxseS5cIn0ifX0sICJpbmxpbmVfZGF0YSI6IG51bGwsICJ0ZXh0IjogbnVsbCwgInRob3VnaHQiOiBudWxsLCAidGhvdWdodF9zaWduYXR1cmUiOiBudWxsLCAidmlkZW9fbWV0YWRhdGEiOiBudWxsLCAidG9vbF9jYWxsIjogbnVsbCwgInRvb2xfcmVzcG9uc2UiOiBudWxsLCAicGFydF9tZXRhZGF0YSI6IG51bGx9XSwgInJvbGUiOiAidXNlciJ9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfSwgeyJhdXRob3IiOiAiaHJfb25ib2FyZGluZ19jb29yZGluYXRvciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IHsiaWQiOiAiejc1N294M24iLCAiYXJncyI6IHsiZW1wbG95ZWVfaWQiOiAiZW1wLTc4OSIsICJub3RlcyI6ICJNYW51YWwgSFIgb3ZlcnJpZGUgcmVjZWl2ZWQuIFNvZnR3YXJlIGFjY291bnRzIGhhdmUgYmVlbiBwcm92aXNpb25lZCBhbmQgaGFyZHdhcmUgaGFzIGJlZW4gb3JkZXJlZCAoVHJhY2tpbmcgSUQ6IEhXLTc4OSkuIE5vdyBhd2FpdGluZyBoYXJkd2FyZSBkZWxpdmVyeSBvciBtYW51YWwgSVQgb3ZlcnJpZGUuIiwgInN0YXR1cyI6ICJBV0FJVElOR19IQVJEV0FSRV9ERUxJVkVSWSJ9LCAibmFtZSI6ICJzZXRfbW9kZWxfcmVzcG9uc2UiLCAicGFydGlhbF9hcmdzIjogbnVsbCwgIndpbGxfY29udGludWUiOiBudWxsfSwgImZ1bmN0aW9uX3Jlc3BvbnNlIjogbnVsbCwgImlubGluZV9kYXRhIjogbnVsbCwgInRleHQiOiBudWxsLCAidGhvdWdodCI6IG51bGwsICJ0aG91Z2h0X3NpZ25hdHVyZSI6IG51bGwsICJ2aWRlb19tZXRhZGF0YSI6IG51bGwsICJ0b29sX2NhbGwiOiBudWxsLCAidG9vbF9yZXNwb25zZSI6IG51bGwsICJwYXJ0X21ldGFkYXRhIjogbnVsbH1dLCAicm9sZSI6ICJtb2RlbCJ9LCAiZXZlbnRfdGltZSI6IG51bGwsICJzdGF0ZV9kZWx0YSI6IG51bGwsICJhY3RpdmVfdG9vbHMiOiBudWxsfSwgeyJhdXRob3IiOiAiaHJfb25ib2FyZGluZ19jb29yZGluYXRvciIsICJjb250ZW50IjogeyJwYXJ0cyI6IFt7Im1lZGlhX3Jlc29sdXRpb24iOiBudWxsLCAiY29kZV9leGVjdXRpb25fcmVzdWx0IjogbnVsbCwgImV4ZWN1dGFibGVfY29kZSI6IG51bGwsICJmaWxlX2RhdGEiOiBudWxsLCAiZnVuY3Rpb25fY2FsbCI6IG51bGwsICJmdW5jdGlvbl9yZXNwb25zZSI6IHsid2lsbF9jb250aW51ZSI6IG51bGwsICJzY2hlZHVsaW5nIjogbnVsbCwgInBhcnRzIjogbnVsbCwgImlkIjogIno3NTdveDNuIiwgIm5hbWUiOiAic2V0X21vZGVsX3Jlc3BvbnNlIiwgInJlc3BvbnNlIjogeyJlbXBsb3llZV9pZCI6ICJlbXAtNzg5IiwgInN0YXR1cyI6ICJBV0FJVElOR19IQVJEV0FSRV9ERUxJVkVSWSIsICJub3RlcyI6ICJNYW51YWwgSFIgb3ZlcnJpZGUgcmVjZWl2ZWQuIFNvZnR3YXJlIGFjY291bnRzIGhhdmUgYmVlbiBwcm92aXNpb25lZCBhbmQgaGFyZHdhcmUgaGFzIGJlZW4gb3JkZXJlZCAoVHJhY2tpbmcgSUQ6IEhXLTc4OSkuIE5vdyBhd2FpdGluZyBoYXJkd2FyZSBkZWxpdmVyeSBvciBtYW51YWwgSVQgb3ZlcnJpZGUuIn19LCAiaW5saW5lX2RhdGEiOiBudWxsLCAidGV4dCI6IG51bGwsICJ0aG91Z2h0IjogbnVsbCwgInRob3VnaHRfc2lnbmF0dXJlIjogbnVsbCwgInZpZGVvX21ldGFkYXRhIjogbnVsbCwgInRvb2xfY2FsbCI6IG51bGwsICJ0b29sX3Jlc3BvbnNlIjogbnVsbCwgInBhcnRfbWV0YWRhdGEiOiBudWxsfV0sICJyb2xlIjogInVzZXIifSwgImV2ZW50X3RpbWUiOiBudWxsLCAic3RhdGVfZGVsdGEiOiBudWxsLCAiYWN0aXZlX3Rvb2xzIjogbnVsbH0sIHsiYXV0aG9yIjogImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3IiLCAiY29udGVudCI6IHsicGFydHMiOiBbeyJtZWRpYV9yZXNvbHV0aW9uIjogbnVsbCwgImNvZGVfZXhlY3V0aW9uX3Jlc3VsdCI6IG51bGwsICJleGVjdXRhYmxlX2NvZGUiOiBudWxsLCAiZmlsZV9kYXRhIjogbnVsbCwgImZ1bmN0aW9uX2NhbGwiOiBudWxsLCAiZnVuY3Rpb25fcmVzcG9uc2UiOiBudWxsLCAiaW5saW5lX2RhdGEiOiBudWxsLCAidGV4dCI6ICJ7XCJlbXBsb3llZV9pZFwiOiBcImVtcC03ODlcIiwgXCJzdGF0dXNcIjogXCJBV0FJVElOR19IQVJEV0FSRV9ERUxJVkVSWVwiLCBcIm5vdGVzXCI6IFwiTWFudWFsIEhSIG92ZXJyaWRlIHJlY2VpdmVkLiBTb2Z0d2FyZSBhY2NvdW50cyBoYXZlIGJlZW4gcHJvdmlzaW9uZWQgYW5kIGhhcmR3YXJlIGhhcyBiZWVuIG9yZGVyZWQgKFRyYWNraW5nIElEOiBIVy03ODkpLiBOb3cgYXdhaXRpbmcgaGFyZHdhcmUgZGVsaXZlcnkgb3IgbWFudWFsIElUIG92ZXJyaWRlLlwifSIsICJ0aG91Z2h0IjogbnVsbCwgInRob3VnaHRfc2lnbmF0dXJlIjogbnVsbCwgInZpZGVvX21ldGFkYXRhIjogbnVsbCwgInRvb2xfY2FsbCI6IG51bGwsICJ0b29sX3Jlc3BvbnNlIjogbnVsbCwgInBhcnRfbWV0YWRhdGEiOiBudWxsfV0sICJyb2xlIjogIm1vZGVsIn0sICJldmVudF90aW1lIjogbnVsbCwgInN0YXRlX2RlbHRhIjogbnVsbCwgImFjdGl2ZV90b29scyI6IG51bGx9XX1dfSwgInVzZXJfc2NlbmFyaW8iOiBudWxsfV0sICJldmFsX2RhdGFzZXRfZGYiOiBudWxsLCAiY2FuZGlkYXRlX25hbWUiOiBudWxsfV0sICJtZXRhZGF0YSI6IHsiY2FuZGlkYXRlX25hbWVzIjogWyJjYW5kaWRhdGVfMSJdLCAiZGF0YXNldF9uYW1lIjogbnVsbCwgImRhdGFzZXRfaWQiOiBudWxsLCAiY3JlYXRpb25fdGltZXN0YW1wIjogIjIwMjYtMDYtMjBUMDQ6NDc6MjAuMTE1MDQ0WiIsICJkYXRhc2V0IjogW3sicHJvbXB0X2Rpc3BsYXlfdGV4dCI6ICIiLCAicHJvbXB0X3Jhd19qc29uIjogIiIsICJyZWZlcmVuY2UiOiAiIiwgInJlZmVyZW5jZV9yYXdfanNvbiI6ICIiLCAicmVzcG9uc2VfZGlzcGxheV90ZXh0IjogIntcImVtcGxveWVlX2lkXCI6IFwidW5rbm93blwiLCBcInN0YXR1c1wiOiBcIkNPTVBMRVRFXCIsIFwibm90ZXNcIjogXCJIYXJkd2FyZSBkZWxpdmVyZWQgc3VjY2Vzc2Z1bGx5IChUcmFja2luZyBJRDogSFctOTk5KS4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuXCJ9IiwgInJlc3BvbnNlX3Jhd19qc29uIjogIntcbiAgXCJwYXJ0c1wiOiBbXG4gICAge1xuICAgICAgXCJ0ZXh0XCI6IFwie1xcXCJlbXBsb3llZV9pZFxcXCI6IFxcXCJ1bmtub3duXFxcIiwgXFxcInN0YXR1c1xcXCI6IFxcXCJDT01QTEVURVxcXCIsIFxcXCJub3Rlc1xcXCI6IFxcXCJIYXJkd2FyZSBkZWxpdmVyZWQgc3VjY2Vzc2Z1bGx5IChUcmFja2luZyBJRDogSFctOTk5KS4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuXFxcIn1cIlxuICAgIH1cbiAgXSxcbiAgXCJyb2xlXCI6IFwibW9kZWxcIlxufSIsICJpbnRlcm1lZGlhdGVfZXZlbnRzIjogbnVsbCwgImFnZW50X2RhdGEiOiAie1wiYWdlbnRzXCI6IHtcImhyX29uYm9hcmRpbmdfd29ya2Zsb3dcIjoge1wiYWdlbnRfaWRcIjogXCJocl9vbmJvYXJkaW5nX3dvcmtmbG93XCIsIFwiYWdlbnRfdHlwZVwiOiBcIldvcmtmbG93XCIsIFwiZGVzY3JpcHRpb25cIjogXCJcIiwgXCJ0b29sc1wiOiBbXSwgXCJzdWJfYWdlbnRzXCI6IFtdfX0sIFwidHVybnNcIjogW3tcInR1cm5faW5kZXhcIjogMCwgXCJldmVudHNcIjogW3tcImF1dGhvclwiOiBcInVzZXJcIiwgXCJjb250ZW50XCI6IHtcInBhcnRzXCI6IFt7XCJ0ZXh0XCI6IFwiU3RhcnQgb25ib2FyZGluZyBmb3IgSmFuZSBEb2UsIGVtcGxveWVlX2lkOiBlbXAtMTIzLlwifV19fV19LCB7XCJ0dXJuX2luZGV4XCI6IDEsIFwiZXZlbnRzXCI6IFt7XCJhdXRob3JcIjogXCJ1c2VyXCIsIFwiY29udGVudFwiOiB7XCJwYXJ0c1wiOiBbe1widGV4dFwiOiBcIldlYmhvb2sgRXZlbnQ6IGRvY3VtZW50c19zaWduZWQgZm9yIGVtcC0xMjNcIn1dfX1dfSwge1widHVybl9pbmRleFwiOiAyLCBcImV2ZW50c1wiOiBbe1wiYXV0aG9yXCI6IFwidXNlclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcInRleHRcIjogXCJXZWJob29rIEV2ZW50OiBoYXJkd2FyZV9kZWxpdmVyZWQgZm9yIHRyYWNraW5nIElEIEhXLTk5OVwifV19fSwge1wiYXV0aG9yXCI6IFwiaHJfb25ib2FyZGluZ19jb29yZGluYXRvclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcImZ1bmN0aW9uX2NhbGxcIjoge1wiaWRcIjogXCJsbDBicndqNlwiLCBcImFyZ3NcIjoge1wibm90ZXNcIjogXCJIYXJkd2FyZSBkZWxpdmVyZWQgc3VjY2Vzc2Z1bGx5IChUcmFja2luZyBJRDogSFctOTk5KS4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuXCIsIFwic3RhdHVzXCI6IFwiQ09NUExFVEVcIiwgXCJlbXBsb3llZV9pZFwiOiBcInVua25vd25cIn0sIFwibmFtZVwiOiBcInNldF9tb2RlbF9yZXNwb25zZVwifX1dLCBcInJvbGVcIjogXCJtb2RlbFwifX0sIHtcImF1dGhvclwiOiBcImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3JcIiwgXCJjb250ZW50XCI6IHtcInBhcnRzXCI6IFt7XCJmdW5jdGlvbl9yZXNwb25zZVwiOiB7XCJpZFwiOiBcImxsMGJyd2o2XCIsIFwibmFtZVwiOiBcInNldF9tb2RlbF9yZXNwb25zZVwiLCBcInJlc3BvbnNlXCI6IHtcImVtcGxveWVlX2lkXCI6IFwidW5rbm93blwiLCBcInN0YXR1c1wiOiBcIkNPTVBMRVRFXCIsIFwibm90ZXNcIjogXCJIYXJkd2FyZSBkZWxpdmVyZWQgc3VjY2Vzc2Z1bGx5IChUcmFja2luZyBJRDogSFctOTk5KS4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuXCJ9fX1dLCBcInJvbGVcIjogXCJ1c2VyXCJ9fSwge1wiYXV0aG9yXCI6IFwiaHJfb25ib2FyZGluZ19jb29yZGluYXRvclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcInRleHRcIjogXCJ7XFxcImVtcGxveWVlX2lkXFxcIjogXFxcInVua25vd25cXFwiLCBcXFwic3RhdHVzXFxcIjogXFxcIkNPTVBMRVRFXFxcIiwgXFxcIm5vdGVzXFxcIjogXFxcIkhhcmR3YXJlIGRlbGl2ZXJlZCBzdWNjZXNzZnVsbHkgKFRyYWNraW5nIElEOiBIVy05OTkpLiBPbmJvYXJkaW5nIGlzIG5vdyBjb21wbGV0ZS5cXFwifVwifV0sIFwicm9sZVwiOiBcIm1vZGVsXCJ9fV19XX0ifSwgeyJwcm9tcHRfZGlzcGxheV90ZXh0IjogIiIsICJwcm9tcHRfcmF3X2pzb24iOiAiIiwgInJlZmVyZW5jZSI6ICIiLCAicmVmZXJlbmNlX3Jhd19qc29uIjogIiIsICJyZXNwb25zZV9kaXNwbGF5X3RleHQiOiAie1wiZW1wbG95ZWVfaWRcIjogXCJlbXAtNDU2XCIsIFwic3RhdHVzXCI6IFwiQ09NUExFVEVcIiwgXCJub3Rlc1wiOiBcIlJlY2VpdmVkIG1hbnVhbCBJVCBvdmVycmlkZSB3ZWJob29rLiBPbmJvYXJkaW5nIGlzIG5vdyBjb21wbGV0ZS5cIn0iLCAicmVzcG9uc2VfcmF3X2pzb24iOiAie1xuICBcInBhcnRzXCI6IFtcbiAgICB7XG4gICAgICBcInRleHRcIjogXCJ7XFxcImVtcGxveWVlX2lkXFxcIjogXFxcImVtcC00NTZcXFwiLCBcXFwic3RhdHVzXFxcIjogXFxcIkNPTVBMRVRFXFxcIiwgXFxcIm5vdGVzXFxcIjogXFxcIlJlY2VpdmVkIG1hbnVhbCBJVCBvdmVycmlkZSB3ZWJob29rLiBPbmJvYXJkaW5nIGlzIG5vdyBjb21wbGV0ZS5cXFwifVwiXG4gICAgfVxuICBdLFxuICBcInJvbGVcIjogXCJtb2RlbFwiXG59IiwgImludGVybWVkaWF0ZV9ldmVudHMiOiBudWxsLCAiYWdlbnRfZGF0YSI6ICJ7XCJhZ2VudHNcIjoge1wiaHJfb25ib2FyZGluZ193b3JrZmxvd1wiOiB7XCJhZ2VudF9pZFwiOiBcImhyX29uYm9hcmRpbmdfd29ya2Zsb3dcIiwgXCJhZ2VudF90eXBlXCI6IFwiV29ya2Zsb3dcIiwgXCJkZXNjcmlwdGlvblwiOiBcIlwiLCBcInRvb2xzXCI6IFtdLCBcInN1Yl9hZ2VudHNcIjogW119fSwgXCJ0dXJuc1wiOiBbe1widHVybl9pbmRleFwiOiAwLCBcImV2ZW50c1wiOiBbe1wiYXV0aG9yXCI6IFwidXNlclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcInRleHRcIjogXCJTdGFydCBvbmJvYXJkaW5nIGZvciBKb2huIFNtaXRoLCBlbXBsb3llZV9pZDogZW1wLTQ1Ni5cIn1dfX1dfSwge1widHVybl9pbmRleFwiOiAxLCBcImV2ZW50c1wiOiBbe1wiYXV0aG9yXCI6IFwidXNlclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcInRleHRcIjogXCJXZWJob29rIEV2ZW50OiBkb2N1bWVudHNfc2lnbmVkIGZvciBlbXAtNDU2XCJ9XX19XX0sIHtcInR1cm5faW5kZXhcIjogMiwgXCJldmVudHNcIjogW3tcImF1dGhvclwiOiBcInVzZXJcIiwgXCJjb250ZW50XCI6IHtcInBhcnRzXCI6IFt7XCJ0ZXh0XCI6IFwiV2ViaG9vayBFdmVudDogbWFudWFsX2l0X292ZXJyaWRlIGZvciBlbXAtNDU2IChJVCBwcm92aXNpb25lZCBtYW51YWxseSBhZnRlciBmYWlsdXJlKVwifV19fSwge1wiYXV0aG9yXCI6IFwiaHJfb25ib2FyZGluZ19jb29yZGluYXRvclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcImZ1bmN0aW9uX2NhbGxcIjoge1wiaWRcIjogXCJlNHJ2eGRxalwiLCBcImFyZ3NcIjoge1wibm90ZXNcIjogXCJSZWNlaXZlZCBtYW51YWwgSVQgb3ZlcnJpZGUgd2ViaG9vay4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuXCIsIFwiZW1wbG95ZWVfaWRcIjogXCJlbXAtNDU2XCIsIFwic3RhdHVzXCI6IFwiQ09NUExFVEVcIn0sIFwibmFtZVwiOiBcInNldF9tb2RlbF9yZXNwb25zZVwifX1dLCBcInJvbGVcIjogXCJtb2RlbFwifX0sIHtcImF1dGhvclwiOiBcImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3JcIiwgXCJjb250ZW50XCI6IHtcInBhcnRzXCI6IFt7XCJmdW5jdGlvbl9yZXNwb25zZVwiOiB7XCJpZFwiOiBcImU0cnZ4ZHFqXCIsIFwibmFtZVwiOiBcInNldF9tb2RlbF9yZXNwb25zZVwiLCBcInJlc3BvbnNlXCI6IHtcImVtcGxveWVlX2lkXCI6IFwiZW1wLTQ1NlwiLCBcInN0YXR1c1wiOiBcIkNPTVBMRVRFXCIsIFwibm90ZXNcIjogXCJSZWNlaXZlZCBtYW51YWwgSVQgb3ZlcnJpZGUgd2ViaG9vay4gT25ib2FyZGluZyBpcyBub3cgY29tcGxldGUuXCJ9fX1dLCBcInJvbGVcIjogXCJ1c2VyXCJ9fSwge1wiYXV0aG9yXCI6IFwiaHJfb25ib2FyZGluZ19jb29yZGluYXRvclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcInRleHRcIjogXCJ7XFxcImVtcGxveWVlX2lkXFxcIjogXFxcImVtcC00NTZcXFwiLCBcXFwic3RhdHVzXFxcIjogXFxcIkNPTVBMRVRFXFxcIiwgXFxcIm5vdGVzXFxcIjogXFxcIlJlY2VpdmVkIG1hbnVhbCBJVCBvdmVycmlkZSB3ZWJob29rLiBPbmJvYXJkaW5nIGlzIG5vdyBjb21wbGV0ZS5cXFwifVwifV0sIFwicm9sZVwiOiBcIm1vZGVsXCJ9fV19XX0ifSwgeyJwcm9tcHRfZGlzcGxheV90ZXh0IjogIiIsICJwcm9tcHRfcmF3X2pzb24iOiAiIiwgInJlZmVyZW5jZSI6ICIiLCAicmVmZXJlbmNlX3Jhd19qc29uIjogIiIsICJyZXNwb25zZV9kaXNwbGF5X3RleHQiOiAie1wiZW1wbG95ZWVfaWRcIjogXCJlbXAtNzg5XCIsIFwic3RhdHVzXCI6IFwiQVdBSVRJTkdfSEFSRFdBUkVfREVMSVZFUllcIiwgXCJub3Rlc1wiOiBcIk1hbnVhbCBIUiBvdmVycmlkZSByZWNlaXZlZC4gU29mdHdhcmUgYWNjb3VudHMgaGF2ZSBiZWVuIHByb3Zpc2lvbmVkIGFuZCBoYXJkd2FyZSBoYXMgYmVlbiBvcmRlcmVkIChUcmFja2luZyBJRDogSFctNzg5KS4gTm93IGF3YWl0aW5nIGhhcmR3YXJlIGRlbGl2ZXJ5IG9yIG1hbnVhbCBJVCBvdmVycmlkZS5cIn0iLCAicmVzcG9uc2VfcmF3X2pzb24iOiAie1xuICBcInBhcnRzXCI6IFtcbiAgICB7XG4gICAgICBcInRleHRcIjogXCJ7XFxcImVtcGxveWVlX2lkXFxcIjogXFxcImVtcC03ODlcXFwiLCBcXFwic3RhdHVzXFxcIjogXFxcIkFXQUlUSU5HX0hBUkRXQVJFX0RFTElWRVJZXFxcIiwgXFxcIm5vdGVzXFxcIjogXFxcIk1hbnVhbCBIUiBvdmVycmlkZSByZWNlaXZlZC4gU29mdHdhcmUgYWNjb3VudHMgaGF2ZSBiZWVuIHByb3Zpc2lvbmVkIGFuZCBoYXJkd2FyZSBoYXMgYmVlbiBvcmRlcmVkIChUcmFja2luZyBJRDogSFctNzg5KS4gTm93IGF3YWl0aW5nIGhhcmR3YXJlIGRlbGl2ZXJ5IG9yIG1hbnVhbCBJVCBvdmVycmlkZS5cXFwifVwiXG4gICAgfVxuICBdLFxuICBcInJvbGVcIjogXCJtb2RlbFwiXG59IiwgImludGVybWVkaWF0ZV9ldmVudHMiOiBudWxsLCAiYWdlbnRfZGF0YSI6ICJ7XCJhZ2VudHNcIjoge1wiaHJfb25ib2FyZGluZ193b3JrZmxvd1wiOiB7XCJhZ2VudF9pZFwiOiBcImhyX29uYm9hcmRpbmdfd29ya2Zsb3dcIiwgXCJhZ2VudF90eXBlXCI6IFwiV29ya2Zsb3dcIiwgXCJkZXNjcmlwdGlvblwiOiBcIlwiLCBcInRvb2xzXCI6IFtdLCBcInN1Yl9hZ2VudHNcIjogW119fSwgXCJ0dXJuc1wiOiBbe1widHVybl9pbmRleFwiOiAwLCBcImV2ZW50c1wiOiBbe1wiYXV0aG9yXCI6IFwidXNlclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcInRleHRcIjogXCJTdGFydCBvbmJvYXJkaW5nIGZvciBCb2IgSm9uZXMsIGVtcGxveWVlX2lkOiBlbXAtNzg5LlwifV19fV19LCB7XCJ0dXJuX2luZGV4XCI6IDEsIFwiZXZlbnRzXCI6IFt7XCJhdXRob3JcIjogXCJ1c2VyXCIsIFwiY29udGVudFwiOiB7XCJwYXJ0c1wiOiBbe1widGV4dFwiOiBcIldlYmhvb2sgRXZlbnQ6IGRvY3VtZW50X3NpZ25hdHVyZV90aW1lb3V0IGZvciBlbXAtNzg5XCJ9XX19XX0sIHtcInR1cm5faW5kZXhcIjogMiwgXCJldmVudHNcIjogW3tcImF1dGhvclwiOiBcInVzZXJcIiwgXCJjb250ZW50XCI6IHtcInBhcnRzXCI6IFt7XCJ0ZXh0XCI6IFwiV2ViaG9vayBFdmVudDogbWFudWFsX2hyX292ZXJyaWRlIGZvciBlbXAtNzg5IChEb2N1bWVudHMgbWFudWFsbHkgY29sbGVjdGVkKVwifV19fSwge1wiYXV0aG9yXCI6IFwiaHJfb25ib2FyZGluZ19jb29yZGluYXRvclwiLCBcImNvbnRlbnRcIjoge1wicGFydHNcIjogW3tcImZ1bmN0aW9uX2NhbGxcIjoge1wiaWRcIjogXCIzcDhwc2ZicVwiLCBcImFyZ3NcIjoge1wiZW1wbG95ZWVfaWRcIjogXCJlbXAtNzg5XCJ9LCBcIm5hbWVcIjogXCJwcm92aXNpb25fc29mdHdhcmVfYWNjb3VudHNcIn19LCB7XCJmdW5jdGlvbl9jYWxsXCI6IHtcImlkXCI6IFwiazM4bmEwZHdcIiwgXCJhcmdzXCI6IHtcImVtcGxveWVlX2lkXCI6IFwiZW1wLTc4OVwifSwgXCJuYW1lXCI6IFwib3JkZXJfaGFyZHdhcmVcIn19XSwgXCJyb2xlXCI6IFwibW9kZWxcIn19LCB7XCJhdXRob3JcIjogXCJocl9vbmJvYXJkaW5nX2Nvb3JkaW5hdG9yXCIsIFwiY29udGVudFwiOiB7XCJwYXJ0c1wiOiBbe1wiZnVuY3Rpb25fcmVzcG9uc2VcIjoge1wiaWRcIjogXCIzcDhwc2ZicVwiLCBcIm5hbWVcIjogXCJwcm92aXNpb25fc29mdHdhcmVfYWNjb3VudHNcIiwgXCJyZXNwb25zZVwiOiB7XCJyZXN1bHRcIjogXCJ7XFxcInN0YXR1c1xcXCI6IFxcXCJTVUNDRVNTXFxcIiwgXFxcImFjdGlvblxcXCI6IFxcXCJTT0ZUV0FSRV9QUk9WSVNJT05FRFxcXCIsIFxcXCJlbXBsb3llZV9pZFxcXCI6IFxcXCJlbXAtNzg5XFxcIiwgXFxcIm1lc3NhZ2VcXFwiOiBcXFwiQWxsIHN0YW5kYXJkIHNvZnR3YXJlIGFjY291bnRzIGNyZWF0ZWQuXFxcIn1cIn19fSwge1wiZnVuY3Rpb25fcmVzcG9uc2VcIjoge1wiaWRcIjogXCJrMzhuYTBkd1wiLCBcIm5hbWVcIjogXCJvcmRlcl9oYXJkd2FyZVwiLCBcInJlc3BvbnNlXCI6IHtcInJlc3VsdFwiOiBcIntcXFwic3RhdHVzXFxcIjogXFxcIlNVQ0NFU1NcXFwiLCBcXFwiYWN0aW9uXFxcIjogXFxcIkhBUkRXQVJFX09SREVSRURcXFwiLCBcXFwiZW1wbG95ZWVfaWRcXFwiOiBcXFwiZW1wLTc4OVxcXCIsIFxcXCJ0cmFja2luZ19pZFxcXCI6IFxcXCJIVy03ODlcXFwiLCBcXFwibWVzc2FnZVxcXCI6IFxcXCJIYXJkd2FyZSBvcmRlcmVkIHN1Y2Nlc3NmdWxseS5cXFwifVwifX19XSwgXCJyb2xlXCI6IFwidXNlclwifX0sIHtcImF1dGhvclwiOiBcImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3JcIiwgXCJjb250ZW50XCI6IHtcInBhcnRzXCI6IFt7XCJmdW5jdGlvbl9jYWxsXCI6IHtcImlkXCI6IFwiejc1N294M25cIiwgXCJhcmdzXCI6IHtcImVtcGxveWVlX2lkXCI6IFwiZW1wLTc4OVwiLCBcIm5vdGVzXCI6IFwiTWFudWFsIEhSIG92ZXJyaWRlIHJlY2VpdmVkLiBTb2Z0d2FyZSBhY2NvdW50cyBoYXZlIGJlZW4gcHJvdmlzaW9uZWQgYW5kIGhhcmR3YXJlIGhhcyBiZWVuIG9yZGVyZWQgKFRyYWNraW5nIElEOiBIVy03ODkpLiBOb3cgYXdhaXRpbmcgaGFyZHdhcmUgZGVsaXZlcnkgb3IgbWFudWFsIElUIG92ZXJyaWRlLlwiLCBcInN0YXR1c1wiOiBcIkFXQUlUSU5HX0hBUkRXQVJFX0RFTElWRVJZXCJ9LCBcIm5hbWVcIjogXCJzZXRfbW9kZWxfcmVzcG9uc2VcIn19XSwgXCJyb2xlXCI6IFwibW9kZWxcIn19LCB7XCJhdXRob3JcIjogXCJocl9vbmJvYXJkaW5nX2Nvb3JkaW5hdG9yXCIsIFwiY29udGVudFwiOiB7XCJwYXJ0c1wiOiBbe1wiZnVuY3Rpb25fcmVzcG9uc2VcIjoge1wiaWRcIjogXCJ6NzU3b3gzblwiLCBcIm5hbWVcIjogXCJzZXRfbW9kZWxfcmVzcG9uc2VcIiwgXCJyZXNwb25zZVwiOiB7XCJlbXBsb3llZV9pZFwiOiBcImVtcC03ODlcIiwgXCJzdGF0dXNcIjogXCJBV0FJVElOR19IQVJEV0FSRV9ERUxJVkVSWVwiLCBcIm5vdGVzXCI6IFwiTWFudWFsIEhSIG92ZXJyaWRlIHJlY2VpdmVkLiBTb2Z0d2FyZSBhY2NvdW50cyBoYXZlIGJlZW4gcHJvdmlzaW9uZWQgYW5kIGhhcmR3YXJlIGhhcyBiZWVuIG9yZGVyZWQgKFRyYWNraW5nIElEOiBIVy03ODkpLiBOb3cgYXdhaXRpbmcgaGFyZHdhcmUgZGVsaXZlcnkgb3IgbWFudWFsIElUIG92ZXJyaWRlLlwifX19XSwgXCJyb2xlXCI6IFwidXNlclwifX0sIHtcImF1dGhvclwiOiBcImhyX29uYm9hcmRpbmdfY29vcmRpbmF0b3JcIiwgXCJjb250ZW50XCI6IHtcInBhcnRzXCI6IFt7XCJ0ZXh0XCI6IFwie1xcXCJlbXBsb3llZV9pZFxcXCI6IFxcXCJlbXAtNzg5XFxcIiwgXFxcInN0YXR1c1xcXCI6IFxcXCJBV0FJVElOR19IQVJEV0FSRV9ERUxJVkVSWVxcXCIsIFxcXCJub3Rlc1xcXCI6IFxcXCJNYW51YWwgSFIgb3ZlcnJpZGUgcmVjZWl2ZWQuIFNvZnR3YXJlIGFjY291bnRzIGhhdmUgYmVlbiBwcm92aXNpb25lZCBhbmQgaGFyZHdhcmUgaGFzIGJlZW4gb3JkZXJlZCAoVHJhY2tpbmcgSUQ6IEhXLTc4OSkuIE5vdyBhd2FpdGluZyBoYXJkd2FyZSBkZWxpdmVyeSBvciBtYW51YWwgSVQgb3ZlcnJpZGUuXFxcIn1cIn1dLCBcInJvbGVcIjogXCJtb2RlbFwifX1dfV19In1dfSwgImFnZW50X2luZm8iOiBudWxsfQ=="), c => c.charCodeAt(0))));
+
+        function formatDictVals(obj) {
+            if (typeof obj === 'string') return obj;
+            if (obj === undefined || obj === null) return '';
+            if (typeof obj !== 'object') return String(obj);
+            if (Array.isArray(obj)) return JSON.stringify(obj);
+            return Object.entries(obj).map(([k,v]) => `${k}=${formatDictVals(v)}`).join(', ');
+        }
+
+        function formatToolDeclarations(toolDeclarations) {
+            if (!toolDeclarations) return '';
+            let functions = [];
+            if (Array.isArray(toolDeclarations)) {
+                toolDeclarations.forEach(tool => {
+                    if (tool.function_declarations) {
+                        functions = functions.concat(tool.function_declarations);
+                    } else if (tool.name && tool.parameters) {
+                        functions.push(tool);
+                    }
+                });
+            } else if (typeof toolDeclarations === 'object' && toolDeclarations.function_declarations) {
+                functions = toolDeclarations.function_declarations;
+            }
+
+            if (functions.length === 0) {
+                 return `<pre class="raw-json-container">${DOMPurify.sanitize(JSON.stringify(toolDeclarations, null, 2))}</pre>`;
+            }
+
+            let html = '<div class="tool-declarations-container">';
+            functions.forEach(func => {
+                html += '<div class="tool-declaration">';
+                const params = func.parameters && func.parameters.properties ? func.parameters.properties : {};
+                const requiredParams = func.parameters && func.parameters.required ? new Set(func.parameters.required) : new Set();
+                const paramStrings = Object.keys(params).map(p => `${DOMPurify.sanitize(p)}: ${DOMPurify.sanitize(params[p].type)}`).join(', ');
+                html += `<strong>${DOMPurify.sanitize(func.name)}</strong>(${paramStrings})<br>`;
+                if(func.description) html += `<em>${DOMPurify.sanitize(func.description)}</em><br>`;
+                if(Object.keys(params).length > 0) html += 'Parameters:<br>';
+                Object.keys(params).forEach(p => {
+                    html += `&nbsp;&nbsp;- ${DOMPurify.sanitize(p)}: ${DOMPurify.sanitize(params[p].description || '')} ${requiredParams.has(p) ? '<strong>(required)</strong>' : ''}<br>`;
+                });
+                html += '</div>';
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function formatSystemTopology(agents) {
+            if (!agents || Object.keys(agents).length === 0) return '<p>No agent configurations provided.</p>';
+
+            const allSubAgents = new Set();
+            Object.values(agents).forEach(agent => {
+                if (agent.sub_agents) {
+                    agent.sub_agents.forEach(sa => allSubAgents.add(sa));
+                }
+            });
+
+            const roots = Object.keys(agents).filter(id => !allSubAgents.has(id));
+            if (roots.length === 0) {
+                roots.push(Object.keys(agents)[0]);
+            }
+
+            let html = '<div class="topology-container">';
+
+            const renderAgent = (agentId, visited) => {
+                if (visited.has(agentId)) return '';
+                visited.add(agentId);
+
+                const agent = agents[agentId];
+                if (!agent) return '';
+
+                let nodeHtml = `<div class="agent-node">`;
+                nodeHtml += `<div class="agent-node-header">
+                               <span style="font-size:16px;">🤖</span>
+                               <span class="agent-name">${DOMPurify.sanitize(agentId)}</span>
+                               ${agent.agent_type ? `<span class="agent-type">${DOMPurify.sanitize(agent.agent_type)}</span>` : ''}
+                             </div>`;
+
+                nodeHtml += `<div class="agent-node-body">`;
+                if (agent.description) {
+                    nodeHtml += `<div class="agent-desc"><strong>Role:</strong> ${DOMPurify.sanitize(agent.description)}</div>`;
+                }
+                if (agent.instruction) {
+                    nodeHtml += `<div class="agent-inst">
+                                    <details>
+                                        <summary>System Instructions</summary>
+                                        <div class="inst-content">${DOMPurify.sanitize(agent.instruction)}</div>
+                                    </details>
+                                 </div>`;
+                }
+                if (agent.tools && agent.tools.length > 0) {
+                    nodeHtml += `<div class="agent-tools">
+                                    <details>
+                                        <summary>Tools (${agent.tools.length})</summary>
+                                        <div class="tools-content" style="padding:0; border:none; background:transparent;">
+                                            ${formatToolDeclarations(agent.tools)}
+                                        </div>
+                                    </details>
+                                 </div>`;
+                }
+
+                if (agent.sub_agents && agent.sub_agents.length > 0) {
+                    nodeHtml += `<div class="sub-agents-container">`;
+                    agent.sub_agents.forEach(sa => {
+                        nodeHtml += renderAgent(sa, new Set(visited));
+                    });
+                    nodeHtml += `</div>`;
+                }
+
+                nodeHtml += `</div></div>`;
+                return nodeHtml;
+            };
+
+            roots.forEach(rootId => {
+                html += renderAgent(rootId, new Set());
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        function formatAgentData(agentData) {
+            let data = agentData;
+            if (typeof data === 'string') {
+                try { data = JSON.parse(data); } catch(e) { return ''; }
+            }
+            if (!data || !data.turns) return '';
+
+            let html = '<div class="agent-timeline">';
+            data.turns.forEach((turn, idx) => {
+                const tIndex = turn.turn_index !== undefined ? turn.turn_index : (idx + 1);
+                const tId = turn.turn_id ? DOMPurify.sanitize(String(turn.turn_id)) : `turn-${String(tIndex).padStart(3, '0')}`;
+
+                html += `<details open class="turn-details">`;
+                html += `<summary class="turn-summary"><div class="turn-header"><span class="turn-badge">TURN ${tIndex} <span class="turn-divider">|</span> ID: ${tId}</span></div></summary>`;
+
+                if (turn.events) {
+                    turn.events.forEach(event => {
+                        const role = (event.content && event.content.role) ? event.content.role.toLowerCase() : 'model';
+                        const author = event.author ? event.author : role;
+
+                        let iconClass = 'model';
+                        if (role === 'user') iconClass = 'user';
+                        if (role === 'tool') iconClass = 'tool';
+
+                        let svgIcon = '';
+                        if (iconClass === 'user') {
+                            svgIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+                        } else if (iconClass === 'tool') {
+                            svgIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>`;
+                        } else {
+                            svgIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>`;
+                        }
+
+                        html += `<div class="timeline-item">
+                                    <div class="timeline-icon ${iconClass}">${svgIcon}</div>
+                                    <div class="timeline-content">
+                                        <div class="event-header">
+                                            <span class="event-author ${iconClass}">${DOMPurify.sanitize(author)}</span>
+                                            <span class="event-role">${DOMPurify.sanitize(role)}</span>
+                                        </div>
+                                        <div class="event-body">`;
+
+                        if (event.content && event.content.parts) {
+                            event.content.parts.forEach(part => {
+                                if (part.text) {
+                                    html += `<div>${DOMPurify.sanitize(marked.parse(String(part.text)))}</div>`;
+                                } else if (part.function_call) {
+                                    const fnName = part.function_call.name;
+                                    const fnArgs = JSON.stringify(part.function_call.args, null, 2);
+                                    html += `<div class="function-call-title">&gt;_ Function Call: ${DOMPurify.sanitize(fnName)}</div>
+                                             <pre class="dark-code-block">${DOMPurify.sanitize(fnArgs)}</pre>`;
+                                } else if (part.function_response) {
+                                    const fnName = part.function_response.name;
+                                    let fnRes = part.function_response.response;
+                                    if(typeof fnRes === 'object' && fnRes !== null && fnRes.result !== undefined) {
+                                        fnRes = fnRes.result;
+                                    }
+                                    const fnResStr = JSON.stringify(fnRes, null, 2);
+                                    html += `<div class="function-response-title">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                                Tool Output: ${DOMPurify.sanitize(fnName)}
+                                             </div>
+                                             <pre class="dark-code-block">${DOMPurify.sanitize(fnResStr)}</pre>`;
+                                }
+                            });
+                        } else {
+                             html += `<div><pre class="raw-json-container">${DOMPurify.sanitize(JSON.stringify(event.content, null, 2))}</pre></div>`;
+                        }
+
+                        html += `</div></div></div>`;
+                    });
+                }
+                html += `</details>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function renderSummary(summaryMetrics) {
+            const container = document.getElementById('summary-section');
+            let content = '<h2>Summary Metrics</h2>';
+            if (!summaryMetrics || summaryMetrics.length === 0) { container.innerHTML = content + '<p>No summary metrics.</p>'; return; }
+            let table = '<table><thead><tr><th>Metric</th><th>Mean Score</th><th>Std. Dev.</th></tr></thead><tbody>';
+            summaryMetrics.forEach(m => {
+                table += `<tr><td>${m.metric_name || 'N/A'}</td><td>${m.mean_score != null ? m.mean_score.toFixed(4) : 'N/A'}</td><td>${m.stdev_score != null ? m.stdev_score.toFixed(4) : 'N/A'}</td></tr>`;
+            });
+            container.innerHTML = content + table + '</tbody></table>';
+        }
+
+        function renderDetails(caseResults, metadata) {
+            const container = document.getElementById('details-section');
+            container.innerHTML = '<h2>Detailed Results</h2>';
+            if (!caseResults || caseResults.length === 0) { container.innerHTML += '<p>No detailed results.</p>'; return; }
+
+            const datasetRows = metadata && metadata.dataset ? metadata.dataset : [];
+
+            caseResults.forEach((caseResult, i) => {
+                const original_case = datasetRows[caseResult.eval_case_index] || {};
+
+                const isValEmpty = (val) => !val || val === 'None' || val === 'nan' || String(val).trim() === '';
+
+                const promptText = isValEmpty(original_case.prompt_display_text) ? '' : original_case.prompt_display_text;
+                const promptJson = original_case.prompt_raw_json;
+                const reference = isValEmpty(original_case.reference) ? '' : original_case.reference;
+                const referenceJson = original_case.reference_raw_json;
+                const responseText = isValEmpty(original_case.response_display_text) ? '' : original_case.response_display_text;
+                const responseJson = original_case.response_raw_json;
+
+                let agentData = original_case.agent_data;
+                if (typeof agentData === 'string') {
+                    try { agentData = JSON.parse(agentData); } catch(e) {}
+                }
+                const isAgentEval = !!agentData;
+
+                let isRefAgentData = false;
+                let refAgentDataObj = null;
+                if (reference) {
+                    try {
+                        let parsed = typeof reference === 'string' ? JSON.parse(reference) : reference;
+                        if (parsed && parsed.turns) {
+                            isRefAgentData = true;
+                            refAgentDataObj = parsed;
+                        }
+                    } catch(e) {}
+                }
+
+                let card = `<details open><summary style="font-size: 1.2em;">Case #${caseResult.eval_case_index != null ? caseResult.eval_case_index : i}</summary>`;
+
+                if (isAgentEval && agentData.agents && Object.keys(agentData.agents).length > 0) {
+                    card += `<details open class="system-topology-details">
+                                <summary>System Topology</summary>
+                                ${formatSystemTopology(agentData.agents)}
+                             </details>`;
+                }
+
+                if (promptText) {
+                    card += `<div class="prompt-container"><strong>Prompt:</strong><br>${DOMPurify.sanitize(marked.parse(String(promptText)))}</div>`;
+                }
+                if (promptJson && promptJson !== '""' && promptJson !== 'null' && promptJson !== '{}') {
+                    card += `<details class="raw-json-details"><summary>View Raw Prompt JSON</summary><pre class="raw-json-container">${DOMPurify.sanitize(promptJson)}</pre></details>`;
+                }
+
+                if (responseText) {
+                    const responseTitle = isAgentEval ? 'Final Response' : 'Candidate Response';
+                    card += `<div class="response-container"><h4>${responseTitle}</h4>${DOMPurify.sanitize(marked.parse(String(responseText)))}</div>`;
+                }
+                if (responseJson && responseJson !== '""' && responseJson !== 'null' && responseJson !== '{}') {
+                    card += `<details class="raw-json-details"><summary>View Raw Response JSON</summary><pre class="raw-json-container">${DOMPurify.sanitize(responseJson)}</pre></details>`;
+                }
+
+                let hasTrace = isAgentEval && agentData.turns;
+                let hasRef = !!reference;
+
+                if (hasTrace || hasRef) {
+                    card += `<div style="display: flex; gap: 1rem; margin-top: 16px;">`;
+
+                    if (hasTrace) {
+                        let traceContent = formatAgentData(agentData);
+                        card += `<div style="flex: 1; min-width: 0;">
+                                     <details open class="conversation-trace-details" style="margin: 0; height: 100%;">
+                                        <summary>Conversation Trace</summary>
+                                        <div style="font-size:13px; color:#5f6368; margin-bottom:12px;">Sequence of multi-agent events across turns</div>
+                                        <div class="agent-trace-container">${traceContent}</div>
+                                     </details>
+                                 </div>`;
+                    }
+
+                    if (hasRef) {
+                        card += `<div style="flex: 1; min-width: 0;">`;
+                        if (isRefAgentData) {
+                            let refTraceContent = formatAgentData(refAgentDataObj);
+                            card += `<details open class="conversation-trace-details" style="margin: 0; height: 100%;">
+                                        <summary>Reference</summary>
+                                        <div style="font-size:13px; color:#5f6368; margin-bottom:12px;">Sequence of multi-agent events across turns</div>
+                                        <div class="agent-trace-container">${refTraceContent}</div>
+                                     </details>`;
+                        } else {
+                            card += `<div class="reference-container" style="margin: 0; height: 100%;"><strong>Reference</strong><br>${DOMPurify.sanitize(marked.parse(String(reference)))}</div>`;
+                        }
+                        card += `</div>`;
+                    }
+                    card += `</div>`;
+                }
+
+                let metricTable = '<h3 style="margin-top:24px;">Evaluation Metrics</h3><div class="metrics-list">';
+                const candidateMetrics = (caseResult.response_candidate_results && caseResult.response_candidate_results[0] && caseResult.response_candidate_results[0].metric_results) || {};
+                Object.entries(candidateMetrics).forEach(([name, val]) => {
+                    let metricNameCell = `<strong>${name}</strong>`;
+                    let explanationHandled = false;
+                    let bubbles = '';
+
+                    if (name.startsWith('hallucination') && val.explanation) {
+                        try {
+                            const explanationData = typeof val.explanation === 'string' ? JSON.parse(val.explanation) : val.explanation;
+                            if (Array.isArray(explanationData) && explanationData.length > 0) {
+                                let sentenceGroups = [];
+                                if (explanationData[0].explanation && Array.isArray(explanationData[0].explanation)) {
+                                    explanationData.forEach(item => {
+                                        if(item.explanation && Array.isArray(item.explanation)) {
+                                            sentenceGroups.push(item.explanation);
+                                        }
+                                    });
+                                } else if (explanationData[0].sentence) {
+                                    sentenceGroups.push(explanationData);
+                                }
+
+                                if(sentenceGroups.length > 0) {
+                                    sentenceGroups.forEach(sentenceList => {
+                                        bubbles += '<div class="rubric-bubble-container" style="margin-top: 8px;">';
+                                        sentenceList.forEach(item => {
+                                            let sentence = item.sentence || 'N/A';
+                                            const label = item.label ? item.label.toLowerCase() : '';
+                                            const isPass = label === 'no_rad' || label === 'supported';
+                                            const verdictText = isPass ? '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
+                                            if (isPass) {
+                                                sentence = `"${sentence}" is grounded`;
+                                            }
+                                            const rationale = item.rationale || 'N/A';
+                                            const itemJson = JSON.stringify(item, null, 2);
+                                            bubbles += `
+                                                <details class="rubric-details">
+                                                    <summary class="rubric-bubble">${verdictText}: ${DOMPurify.sanitize(sentence)}</summary>
+                                                    <div class="explanation" style="padding: 10px 0 0 20px;">${DOMPurify.sanitize(rationale)}</div>
+                                                    <pre class="raw-json-container">${DOMPurify.sanitize(itemJson)}</pre>
+                                                </details>`;
+                                        });
+                                        bubbles += '</div>';
+                                    });
+                                    explanationHandled = true;
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Failed to parse hallucination explanation:", e);
+                        }
+                    } else if (name.startsWith('safety') && val.score != null) {
+                        try {
+                            bubbles += '<div class="rubric-bubble-container" style="margin-top: 8px;">';
+                            const verdictText = val.score >= 1.0 ? '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
+                            const explanation = val.explanation || (val.score >= 1.0 ? 'Safety check passed' : 'Safety check failed');
+                            const itemJson = JSON.stringify(val, null, 2);
+                            bubbles += `
+                                <details class="rubric-details">
+                                    <summary class="rubric-bubble">${verdictText}: ${DOMPurify.sanitize(explanation)}</summary>
+                                    <pre class="raw-json-container">${DOMPurify.sanitize(itemJson)}</pre>
+                                </details>`;
+                            bubbles += '</div>';
+                            explanationHandled = true;
+                        } catch (e) {
+                            console.error("Failed to process safety metric:", e);
+                        }
+                    }
+
+                    if (!bubbles && val.rubric_verdicts && val.rubric_verdicts.length > 0) {
+                        bubbles += '<div class="rubric-bubble-container" style="margin-top: 8px;">';
+                        val.rubric_verdicts.forEach(verdict => {
+                            const rubricDescription = verdict.evaluated_rubric && verdict.evaluated_rubric.content && verdict.evaluated_rubric.content.property ? verdict.evaluated_rubric.content.property.description : 'N/A';
+                            const verdictText = verdict.verdict ? '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
+                            const verdictJson = JSON.stringify(verdict, null, 2);
+                            bubbles += `
+                                <details class="rubric-details">
+                                    <summary class="rubric-bubble">${verdictText}: ${DOMPurify.sanitize(rubricDescription)}</summary>
+                                    <pre class="raw-json-container">${DOMPurify.sanitize(verdictJson)}</pre>
+                                </details>`;
+                        });
+                        bubbles += '</div>';
+                    }
+
+                    let scoreDisplay = val.score != null ? val.score.toFixed(2) : 'N/A';
+                    let metricContent = '';
+
+                    if (val.explanation && !explanationHandled) {
+                        metricContent += `<div class="explanation" style="margin-top:0; margin-bottom: 12px;">${DOMPurify.sanitize(marked.parse(String(val.explanation)))}</div>`;
+                    }
+                    if (bubbles) {
+                        metricContent += bubbles;
+                    }
+                    if (!metricContent) {
+                        metricContent = `<div style="color: #80868b; font-style: italic; font-size: 13px;">No additional details.</div>`;
+                    }
+
+                    metricTable += `
+                        <details class="metric-details" open>
+                            <summary class="metric-summary">
+                                <div class="metric-name-wrapper">${DOMPurify.sanitize(name)}</div>
+                                <div class="metric-score">${DOMPurify.sanitize(scoreDisplay)}</div>
+                            </summary>
+                            <div class="metric-body">
+                                ${metricContent}
+                            </div>
+                        </details>
+                    `;
+                });
+                metricTable += '</div>';
+                card += metricTable + '</details>';
+                container.innerHTML += card;
+            });
+        }
+
+        renderSummary(vizData_vertex_eval_sdk.summary_metrics);
+        renderDetails(vizData_vertex_eval_sdk.eval_case_results, vizData_vertex_eval_sdk.metadata);
+    </script>
+</body>
+</html>
